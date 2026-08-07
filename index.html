@@ -1948,130 +1948,217 @@
                 tbody.innerHTML = "";
                 const data = snapshot.val();
                 if(data) {
-                    Object.keys(data).forEach(key => {
+                    const keys = Object.keys(data);
+                    keys.forEach(key => {
                         const rec = data[key];
                         const tr = document.createElement('tr');
+                        
+                        let actionButtons = "";
+                        let extraFieldHtml = "";
 
-                        if (currentAdminTab === 'comunidad') {
-                            const isPending = rec.status === "pendiente";
-                            const statusBadge = isPending ? 
-                                `<span class="badge" style="background:rgba(255,153,102,0.2); color:#ff9966; border-color:#ff9966;">Pendiente</span>` : 
-                                `<span class="badge" style="background:rgba(56,239,125,0.2); color:#38ef7d; border-color:#38ef7d;">Autorizado</span>`;
-
-                            const actionBtns = isPending ? `
-                                <div style="display:flex; gap:6px;">
-                                    <button class="btn-action" onclick="adminAuthorizeUser('${key}')" style="background: linear-gradient(to bottom, #38ef7d, #11998e);">
-                                        <i class="fa-solid fa-check"></i> Autorizar
-                                    </button>
-                                    <button class="btn-action" onclick="adminDeleteRecord('comunidad_records', '${key}')" style="background: linear-gradient(to bottom, #ff9966, #ff5e62);">
-                                        <i class="fa-solid fa-trash"></i> Rechazar
-                                    </button>
-                                </div>
-                            ` : `<span style="color:#38ef7d; font-weight:700;">Aprobado</span>`;
-
-                            tr.innerHTML = `
-                                <td>${key.slice(0,10)}...</td>
-                                <td><strong>${rec.usuario}</strong></td>
-                                <td><span class="copy-email-badge" onclick="navigator.clipboard.writeText('${rec.email}')">${rec.email} <i class="fa-regular fa-copy"></i></span></td>
-                                <td>${rec.accion}</td>
-                                <td>${rec.detalle || 'N/A'}</td>
-                                <td>${statusBadge}</td>
-                                <td>${actionBtns}</td>
+                        if (currentAdminTab === 'activos') {
+                            actionButtons = `
+                                <button class="btn-action" style="background:linear-gradient(to bottom,#38ef7d,#11998e);" onclick="adminMarkDelivered('${key}')"><i class="fa-solid fa-check"></i> Entregar</button>
+                                <button class="btn-action" style="background:linear-gradient(to bottom,#ff5e62,#ff9966);" onclick="adminMarkRejected('${key}')"><i class="fa-solid fa-xmark"></i> Rechazar</button>
+                                <button class="btn-action" onclick="openAdminChat('${rec.ticketId}', '${rec.usuario}')"><i class="fa-solid fa-comments"></i> Chat</button>
+                            `;
+                        } else if (currentAdminTab === 'comunidad') {
+                            actionButtons = `
+                                <button class="btn-action" style="background:linear-gradient(to bottom,#38ef7d,#11998e);" onclick="adminAuthorizeComunidad('${key}')"><i class="fa-solid fa-user-check"></i> Autorizar</button>
+                                <button class="btn-action" style="background:linear-gradient(to bottom,#ff5e62,#ff9966);" onclick="adminRejectComunidad('${key}')"><i class="fa-solid fa-user-xmark"></i> Rechazar</button>
                             `;
                         } else if (currentAdminTab === 'recuperaciones') {
-                            // Pestaña de Recuperaciones: Aceptar información y asignar código de 6 dígitos
-                            const isAccepted = rec.status === "aceptado_con_codigo";
-                            const statusBadge = isAccepted ? 
-                                `<span class="badge" style="background:rgba(56,239,125,0.2); color:#38ef7d; border-color:#38ef7d;">Código Asignado: ${rec.code}</span>` : 
-                                `<span class="badge" style="background:rgba(255,153,102,0.2); color:#ff9966; border-color:#ff9966;">Solicitud Activa</span>`;
-
-                            const actionBtns = `
-                                <div style="display:flex; gap:6px; align-items:center;">
-                                    <input type="text" id="code-input-${key}" maxlength="6" placeholder="Código (6 dígitos)" style="width: 130px; padding: 6px; font-size: 12px;" value="${rec.code || ''}">
-                                    <button class="btn-action" onclick="adminAcceptRecovery('${key}')" style="background: linear-gradient(to bottom, #38ef7d, #11998e);">
-                                        <i class="fa-solid fa-paper-plane"></i> Aceptar y Enviar Código
-                                    </button>
-                                    <button class="btn-action" onclick="adminDeleteRecord('recuperaciones_records', '${key}')" style="background: linear-gradient(to bottom, #ff9966, #ff5e62);">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </div>
+                            extraFieldHtml = `<div style="margin-top:6px;"><input type="text" id="rec-code-${key}" placeholder="Código manual" style="padding:6px; font-size:12px; width:110px; display:inline-block;" value="${rec.code || ''}"> <button class="btn-action" style="background:linear-gradient(to bottom,#00d2ff,#0072ff); padding:6px 10px; margin-top:2px;" onclick="enviarCodigoPorCorreo('${rec.email}', '${key}')"><i class="fa-solid fa-envelope"></i> Enviar código por correo</button></div>`;
+                            actionButtons = `
+                                <button class="btn-action" style="background:linear-gradient(to bottom,#38ef7d,#11998e);" onclick="adminAcceptRecuperacion('${key}')"><i class="fa-solid fa-key"></i> Aceptar</button>
+                                <button class="btn-action" style="background:linear-gradient(to bottom,#ff5e62,#ff9966);" onclick="adminRejectRecuperacion('${key}')"><i class="fa-solid fa-ban"></i> Rechazar</button>
                             `;
-
-                            tr.innerHTML = `
-                                <td>REC-${key.slice(0,6)}</td>
-                                <td><strong>${rec.usuario}</strong></td>
-                                <td><span class="copy-email-badge" onclick="navigator.clipboard.writeText('${rec.email}')">${rec.email} <i class="fa-regular fa-copy"></i></span></td>
-                                <td>Recuperación</td>
-                                <td>${rec.detalle || 'Solicitud de contraseña'}</td>
-                                <td>${statusBadge}</td>
-                                <td>${actionBtns}</td>
-                            `;
-                        } else {
-                            tr.innerHTML = `
-                                <td>${rec.ticketId || key}</td>
-                                <td><strong>${rec.usuario}</strong></td>
-                                <td><span class="copy-email-badge" onclick="navigator.clipboard.writeText('${rec.email}')">${rec.email} <i class="fa-regular fa-copy"></i></span></td>
-                                <td>${rec.accion}</td>
-                                <td>${rec.detalle}</td>
-                                <td>${rec.imageSrc ? `<img src="${rec.imageSrc}" class="img-preview" onclick="openImageModal('${rec.imageSrc}')">` : '<span style="color:var(--text-muted)">Sin media</span>'}</td>
-                                <td>
-                                    <button class="btn-action" onclick="openAdminChat('${rec.ticketId}', '${rec.usuario}')"><i class="fa-solid fa-comments"></i> Chat</button>
-                                    <button class="btn-action" onclick="adminDeleteRecord('${targetEndpoint}', '${key}')" style="background:linear-gradient(to bottom, #ff9966, #ff5e62)"><i class="fa-solid fa-trash"></i></button>
-                                </td>
+                        } else if (currentAdminTab === 'entregadas') {
+                            actionButtons = `
+                                <button class="btn-action" style="background:linear-gradient(to bottom,#ff5e62,#ff9966);" onclick="adminDeleteDelivered('${key}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
                             `;
                         }
+
+                        let mediaHtml = rec.imageSrc ? `<a href="${rec.imageSrc}" target="_blank"><img src="${rec.imageSrc}" class="img-preview"></a>` : `<span style="color:var(--text-muted); font-size:12px;">Sin media</span>`;
+                        let idOrTicket = rec.ticketId || key;
+
+                        tr.innerHTML = `
+                            <td><strong>${idOrTicket}</strong></td>
+                            <td>${rec.usuario || 'N/A'}</td>
+                            <td>${rec.email || 'N/A'}</td>
+                            <td><span class="badge">${rec.accion || 'Registro'}</span></td>
+                            <td>${rec.detalle || 'N/A'} ${extraFieldHtml}</td>
+                            <td>${mediaHtml}</td>
+                            <td><div style="display:flex; gap:6px; flex-wrap:wrap;">${actionButtons}</div></td>
+                        `;
                         tbody.appendChild(tr);
                     });
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay registros en esta sección.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">No hay registros en esta sección.</td></tr>`;
                 }
-            }, { onlyOnce: false });
+            }, { onlyOnce: true });
         }
 
-        function adminAuthorizeUser(key) {
-            if(!window.firebaseDB) return;
-            window.dbSet(window.dbRef(window.firebaseDB, `comunidad_records/${key}/status`), "autorizado");
-        }
+        function enviarCodigoPorCorreo(email, key) {
+            const codeInput = document.getElementById(`rec-code-${key}`);
+            const manualCode = codeInput ? codeInput.value.trim() : "";
 
-        // Función del Admin para aceptar la recuperación y guardar el código de 6 dígitos
-        function adminAcceptRecovery(key) {
-            if(!window.firebaseDB) return;
-            const codeInputVal = document.getElementById(`code-input-${key}`).value.trim();
-            if(!codeInputVal || codeInputVal.length !== 6) {
-                alert("Por función ingresa un código válido de 6 dígitos antes de aceptar.");
+            if (!manualCode) {
+                alert("Por favor escribe el código manualmente en el campo correspondiente antes de enviarlo.");
                 return;
             }
 
-            window.dbSet(window.dbRef(window.firebaseDB, `recuperaciones_records/${key}/code`), codeInputVal);
-            window.dbSet(window.dbRef(window.firebaseDB, `recuperaciones_records/${key}/status`), "aceptado_con_codigo")
-                .then(() => {
-                    alert(`Código ${codeInputVal} guardado con éxito. Ahora envíaselo al correo del usuario manualmente.`);
-                });
+            const plantillaHtml = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2>Moon Shop - Recuperación de Cuenta</h2>
+                    <p>Hola, has solicitado recuperar tu cuenta. Tu código de verificación es:</p>
+                    <h1 style="background: #00d2ff; color: #fff; padding: 10px 20px; display: inline-block; border-radius: 6px; letter-spacing: 4px;">{{CODE}}</h1>
+                    <p>Si no solicitaste este código, puedes ignorar este mensaje.</p>
+                </div>
+            `;
+
+            const htmlFinal = plantillaHtml.replace("{{CODE}}", manualCode);
+
+            const payload = {
+                to: email,
+                subject: "Código de verificación",
+                html: htmlFinal
+            };
+
+            fetch("/api/send", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Código enviado correctamente al correo del usuario.");
+                } else {
+                    return response.text().then(errText => {
+                        throw new Error(errText || response.statusText);
+                    });
+                }
+            })
+            .catch(error => {
+                alert("Error al enviar el correo: " + error.message);
+            });
         }
 
-        function adminDeleteRecord(endpoint, key) {
-            if(!window.firebaseDB || !confirm("¿Eliminar este registro?")) return;
-            window.dbRemove(window.dbRef(window.firebaseDB, `${endpoint}/${key}`));
+        function adminMarkDelivered(key) {
+            if(!window.firebaseDB) return;
+            const refPath = window.dbRef(window.firebaseDB, `records/${key}`);
+            window.dbOnValue(refPath, (snapshot) => {
+                const rec = snapshot.val();
+                if(rec) {
+                    window.dbSet(window.dbRef(window.firebaseDB, `delivered_records/${key}`), rec)
+                        .then(() => window.dbRemove(refPath))
+                        .then(() => {
+                            const chatMsgRef = window.dbPush(window.dbRef(window.firebaseDB, `tickets_chats/${key}`));
+                            window.dbSet(chatMsgRef, { sender: 'admin', text: ';Entregado', timestamp: Date.now() });
+                            sendLiveNotification(rec.usuario, "Tu pedido ha sido marcado como Entregado.");
+                            loadAdminRecordsTable();
+                        });
+                }
+            }, { onlyOnce: true });
         }
+
+        function adminMarkRejected(key) {
+            if(!window.firebaseDB) return;
+            const refPath = window.dbRef(window.firebaseDB, `records/${key}`);
+            window.dbOnValue(refPath, (snapshot) => {
+                const rec = snapshot.val();
+                if(rec) {
+                    const chatMsgRef = window.dbPush(window.dbRef(window.firebaseDB, `tickets_chats/${key}`));
+                    window.dbSet(chatMsgRef, { sender: 'admin', text: '/Pedido Rechazado', timestamp: Date.now() });
+                    sendLiveNotification(rec.usuario, "Tu solicitud ha sido rechazada por el administrador.");
+                    loadAdminRecordsTable();
+                }
+            }, { onlyOnce: true });
+        }
+
+        function adminAuthorizeComunidad(key) {
+            if(!window.firebaseDB) return;
+            const refPath = window.dbRef(window.firebaseDB, `comunidad_records/${key}`);
+            window.dbOnValue(refPath, (snapshot) => {
+                const rec = snapshot.val();
+                if(rec) {
+                    window.dbSet(refPath, { ...rec, status: "autorizado" }).then(() => {
+                        loadAdminRecordsTable();
+                    });
+                }
+            }, { onlyOnce: true });
+        }
+
+        function adminRejectComunidad(key) {
+            if(!window.firebaseDB) return;
+            window.dbRemove(window.dbRef(window.firebaseDB, `comunidad_records/${key}`)).then(() => {
+                loadAdminRecordsTable();
+            });
+        }
+
+        function adminAcceptRecuperacion(key) {
+            if(!window.firebaseDB) return;
+            const codeInput = document.getElementById(`rec-code-${key}`);
+            const codeVal = codeInput ? codeInput.value.trim() : "";
+            
+            if(!codeVal) { alert("Por favor escribe un código para enviarlo al usuario."); return; }
+
+            const refPath = window.dbRef(window.firebaseDB, `recuperaciones_records/${key}`);
+            window.dbOnValue(refPath, (snapshot) => {
+                const rec = snapshot.val();
+                if(rec) {
+                    window.dbSet(refPath, { ...rec, status: "aceptado_con_codigo", code: codeVal }).then(() => {
+                        alert("Código guardado y enviado al usuario exitosamente.");
+                        loadAdminRecordsTable();
+                    });
+                }
+            }, { onlyOnce: true });
+        }
+
+        function adminRejectRecuperacion(key) {
+            if(!window.firebaseDB) return;
+            window.dbRemove(window.dbRef(window.firebaseDB, `recuperaciones_records/${key}`)).then(() => {
+                loadAdminRecordsTable();
+            });
+        }
+
+        function adminDeleteDelivered(key) {
+            if(!window.firebaseDB) return;
+            window.dbRemove(window.dbRef(window.firebaseDB, `delivered_records/${key}`)).then(() => {
+                loadAdminRecordsTable();
+            });
+        }
+
+        function sendLiveNotification(username, text) {
+            if(!window.firebaseDB || !username) return;
+            window.dbSet(window.dbRef(window.firebaseDB, `notifications/${username}`), { text: text, timestamp: Date.now() });
+        }
+
+        let adminActiveTicketKey = "";
+        let adminChatListenerRef = null;
 
         function openAdminChat(ticketId, username) {
+            adminActiveTicketKey = ticketId.replace('#','');
+            document.getElementById('admin-chat-target-title').innerText = `Chat de Ticket Encriptado (${ticketId})`;
+            document.getElementById('insta-header-username').innerText = `Operador con: ${username}`;
+
             document.getElementById('admin-fullscreen-view').classList.add('hidden');
             document.getElementById('admin-chat-view').classList.remove('hidden');
-            document.getElementById('admin-chat-target-title').innerText = `Ticket ${ticketId}`;
-            document.getElementById('insta-header-username').innerText = `Operador / Cliente: ${username}`;
-            window.currentAdminActiveTicket = ticketId;
-            
-            const cleanKey = ticketId.replace('#','');
-            window.dbOnValue(window.dbRef(window.firebaseDB, `tickets_chats/${cleanKey}`), (snapshot) => {
+
+            if(window.firebaseDB && adminChatListenerRef) window.dbOff(window.dbRef(window.firebaseDB, `tickets_chats/${adminActiveTicketKey}`));
+
+            adminChatListenerRef = window.dbOnValue(window.dbRef(window.firebaseDB, `tickets_chats/${adminActiveTicketKey}`), (snapshot) => {
                 const zone = document.getElementById('admin-chat-messages-zone');
                 if(!zone) return; zone.innerHTML = "";
                 const data = snapshot.val();
                 if(data) {
                     Object.keys(data).forEach(k => {
-                        const m = data[k];
+                        const msg = data[k];
                         const bubble = document.createElement('div');
-                        bubble.className = `msg-bubble ${m.sender === 'admin' ? 'admin' : 'user'}`;
-                        bubble.innerHTML = formatChatMessageText(m.text);
+                        bubble.className = `msg-bubble ${msg.sender === 'admin' ? 'user' : 'admin'}`;
+                        bubble.innerHTML = formatChatMessageText(msg.text);
                         zone.appendChild(bubble);
                     });
                     zone.scrollTop = zone.scrollHeight;
@@ -2080,17 +2167,21 @@
         }
 
         function closeAdminChat() {
+            if(window.firebaseDB && adminChatListenerRef) {
+                window.dbOff(window.dbRef(window.firebaseDB, `tickets_chats/${adminActiveTicketKey}`));
+                adminChatListenerRef = null;
+            }
             document.getElementById('admin-chat-view').classList.add('hidden');
             document.getElementById('admin-fullscreen-view').classList.remove('hidden');
+            loadAdminRecordsTable();
         }
 
         function sendAdminChatMessage() {
             const input = document.getElementById('admin-chat-input-field');
             const txt = input.value.trim();
-            if(!txt || !window.currentAdminActiveTicket || !window.firebaseDB) return;
+            if(!txt || !adminActiveTicketKey || !window.firebaseDB) return;
 
-            const cleanKey = window.currentAdminActiveTicket.replace('#','');
-            const msgRef = window.dbPush(window.dbRef(window.firebaseDB, `tickets_chats/${cleanKey}`));
+            const msgRef = window.dbPush(window.dbRef(window.firebaseDB, `tickets_chats/${adminActiveTicketKey}`));
             window.dbSet(msgRef, { sender: 'admin', text: txt, timestamp: Date.now() });
             input.value = "";
         }
