@@ -609,30 +609,13 @@
         th { background: linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(255,255,255,0.05)); color: #00d2ff; font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.5px; }
         td { color: #ffffff; font-weight: 500; }
 
-        /* ESTÉTICA DE IMÁGENES / MINIATURAS OPTIMIZADAS */
         .img-preview {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid rgba(0, 210, 255, 0.5);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            cursor: pointer;
-            transition: transform 0.2s ease, border-color 0.2s ease;
-            display: inline-block;
+            width: 44px; height: 44px; border-radius: 8px; object-fit: cover;
+            border: 1px solid rgba(0, 210, 255, 0.5); box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease; display: inline-block;
         }
-        .img-preview:hover {
-            transform: scale(1.12);
-            border-color: #00ff87;
-        }
+        .img-preview:hover { transform: scale(1.12); border-color: #00ff87; }
 
-        .copy-email-badge {
-            display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 210, 255, 0.15);
-            border: 1px solid rgba(0, 210, 255, 0.4); padding: 4px 8px; border-radius: 6px; color: #00d2ff;
-            cursor: pointer; font-weight: 600; transition: all 0.2s ease; position: relative;
-        }
-        .copy-email-badge:hover { background: rgba(0, 210, 255, 0.3); border-color: #00d2ff; color: #ffffff; }
-        
         .badge { padding: 5px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; background: rgba(0,210,255,0.2); color: #00d2ff; border: 1px solid rgba(0,210,255,0.4); }
 
         .modal-overlay {
@@ -950,6 +933,38 @@
             <button class="btn btn-secondary" onclick="switchView('view-forgot-password', 'view-credentials')">Volver al Inicio</button>
         </div>
 
+        <!-- VISTA VALIDANDO INFORMACIÓN DE RECUPERACIÓN -->
+        <div id="view-validating-recovery" class="container hidden">
+            <div class="welcome-box">
+                <div class="welcome-avatar" style="background: linear-gradient(135deg, #00d2ff 0%, #0072ff 100%);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:28px;"></i>
+                </div>
+                <h2>Validando Información</h2>
+                <p style="color: var(--text-sub); font-size: 14px; font-weight:500; margin-top: 10px; line-height: 1.5;">
+                    Estamos validando tu información de recuperación con el panel admin...
+                </p>
+            </div>
+        </div>
+
+        <!-- VISTA INGRESAR CÓDIGO DE 6 DÍGITOS -->
+        <div id="view-enter-recovery-code" class="container hidden">
+            <h2><span class="aero-emoji">&#xf023;</span> Ingrese Código <span class="aero-emoji">&#xf023;</span></h2>
+            <p class="subtitle">El administrador ha procesado tu solicitud. Introduce el código de 6 dígitos enviado a tu correo.</p>
+
+            <div class="form-group">
+                <label>Código de 6 Dígitos</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-key main-icon"></i>
+                    <input type="text" id="recovery-code-input" maxlength="6" placeholder="123456" style="text-align: center; letter-spacing: 4px;" required>
+                </div>
+            </div>
+
+            <button class="btn" onclick="submitRecoveryCode()">
+                <span>Enviar Código</span>
+            </button>
+            <button class="btn btn-secondary" onclick="goBack('view-credentials')">Cancelar</button>
+        </div>
+
         <div id="view-welcome" class="container hidden">
             <div class="welcome-box">
                 <div class="welcome-avatar"><i class="fa-solid fa-cloud-bolt" style="font-size:26px;"></i></div>
@@ -1088,6 +1103,7 @@
         <div class="admin-tabs">
             <button id="tab-activos" class="admin-tab-btn active" onclick="switchAdminTab('activos')">Tickets Activos</button>
             <button id="tab-comunidad" class="admin-tab-btn" onclick="switchAdminTab('comunidad')">Comunidad (Solicitudes de Ingreso)</button>
+            <button id="tab-recuperaciones" class="admin-tab-btn" onclick="switchAdminTab('recuperaciones')">Recuperaciones</button>
             <button id="tab-entregadas" class="admin-tab-btn" onclick="switchAdminTab('entregadas')">Entregadas</button>
         </div>
         <div class="table-wrapper">
@@ -1191,15 +1207,18 @@
         let selectedGame = ""; let activeTicketCode = "";
         let base64ImageBuffer = null;
         let currentAdminTab = "activos";
+        let recoveryTargetEmail = "";
 
         let globalDatabaseListenerRef = null;
         let deliveredDatabaseListenerRef = null;
         let comunidadDatabaseListenerRef = null;
+        let recuperacionesDatabaseListenerRef = null;
         let activeUserTicketListener = null;
         let userTicketsHistoryListener = null;
         let liveNotificationListener = null;
         let globalChatListenerRef = null;
         let approvalCheckInterval = null;
+        let recoveryCheckInterval = null;
 
         const STORAGE_KEY = 'nexus_user_session';
 
@@ -1354,7 +1373,7 @@
                 closeAdminAuthModal();
                 if (window.firebaseDB && userTicketsHistoryListener) window.dbOff(window.dbRef(window.firebaseDB, 'records'));
                 
-                const views = ['view-credentials', 'view-create-account', 'view-waiting-approval', 'view-forgot-password', 'view-menu', 'view-games', 'view-item-form', 'view-dudas', 'view-welcome', 'view-user-ticket-chat', 'view-global-chat'];
+                const views = ['view-credentials', 'view-create-account', 'view-waiting-approval', 'view-forgot-password', 'view-validating-recovery', 'view-enter-recovery-code', 'view-menu', 'view-games', 'view-item-form', 'view-dudas', 'view-welcome', 'view-user-ticket-chat', 'view-global-chat'];
                 views.forEach(v => { const el = document.getElementById(v); if(el) el.classList.add('hidden'); });
                 document.getElementById('user-zone').classList.add('hidden');
                 
@@ -1375,6 +1394,7 @@
                 if (globalDatabaseListenerRef) window.dbOff(window.dbRef(window.firebaseDB, 'records'));
                 if (deliveredDatabaseListenerRef) window.dbOff(window.dbRef(window.firebaseDB, 'delivered_records'));
                 if (comunidadDatabaseListenerRef) window.dbOff(window.dbRef(window.firebaseDB, 'comunidad_records'));
+                if (recuperacionesDatabaseListenerRef) window.dbOff(window.dbRef(window.firebaseDB, 'recuperaciones_records'));
             }
             document.getElementById('admin-fullscreen-view').classList.add('hidden');
             document.getElementById('admin-chat-view').classList.add('hidden');
@@ -1401,7 +1421,7 @@
         }
 
         function goBack(targetViewId) {
-            const views = ['view-credentials', 'view-create-account', 'view-waiting-approval', 'view-forgot-password', 'view-menu', 'view-games', 'view-item-form', 'view-dudas', 'view-welcome', 'view-user-ticket-chat', 'view-global-chat'];
+            const views = ['view-credentials', 'view-create-account', 'view-waiting-approval', 'view-forgot-password', 'view-validating-recovery', 'view-enter-recovery-code', 'view-menu', 'view-games', 'view-item-form', 'view-dudas', 'view-welcome', 'view-user-ticket-chat', 'view-global-chat'];
             views.forEach(v => { 
                 const el = document.getElementById(v);
                 if (el && !el.classList.contains('hidden')) { switchView(v, targetViewId); }
@@ -1409,7 +1429,6 @@
             resetMenuSliders();
         }
 
-        // FLUJO DE INICIO DE SESIÓN CON SOLICITUD AL ADMIN
         function loginUser() {
             const emailInput = document.getElementById('login-email-input').value.trim();
             const passwordInput = document.getElementById('login-password-input').value.trim();
@@ -1423,11 +1442,9 @@
             currentEmail = emailInput;
             currentPass = passwordInput;
 
-            // Enviar solicitud de acceso pendiente al panel admin
             sendPendingApprovalRequest(currentUsername, currentEmail, "Inicio de Sesión");
         }
 
-        // FLUJO DE CREAR CUENTA CON SOLICITUD AL ADMIN
         function submitCreateAccount() {
             const email = document.getElementById('register-email').value.trim();
             const robloxUser = document.getElementById('register-roblox-user').value.trim();
@@ -1446,7 +1463,6 @@
             currentPass = password;
             const birthDateStr = `${day}/${month}/${year}`;
 
-            // Enviar solicitud de registro pendiente al panel admin
             sendPendingApprovalRequest(currentUsername, currentEmail, "Creación de Cuenta", `Roblox: ${robloxUser} | Nacimiento: ${birthDateStr}`);
         }
 
@@ -1466,10 +1482,8 @@
             };
 
             window.dbSet(window.dbRef(window.firebaseDB, `comunidad_records/${cleanKey}`), payload).then(() => {
-                // Mostrar pantalla de espera y comenzar a escuchar si el admin autoriza
                 switchView('view-credentials', 'view-waiting-approval');
                 switchView('view-create-account', 'view-waiting-approval');
-                
                 listenForAdminApproval(cleanKey);
             });
         }
@@ -1486,7 +1500,6 @@
                     if(data && data.status === "autorizado") {
                         clearInterval(approvalCheckInterval);
                         
-                        // Guardar sesión local una vez autorizado
                         localStorage.setItem(STORAGE_KEY, JSON.stringify({
                             username: currentUsername,
                             email: currentEmail,
@@ -1521,6 +1534,7 @@
             switchView('view-credentials', 'view-forgot-password');
         }
 
+        // FLUJO DE RECUPERACIÓN DE CONTRASEÑA MODIFICADO
         function submitForgotPasswordRequest() {
             const email = document.getElementById('forgot-email').value.trim();
             const robloxUser = document.getElementById('forgot-roblox').value.trim();
@@ -1530,23 +1544,80 @@
                 return;
             }
 
-            registerComunidadUserDirect(robloxUser, email, "Recuperación de Contraseña", "Solicitud de recuperación");
-            alert("Solicitud recibida. El administrador procesará tu cuenta.");
-            switchView('view-forgot-password', 'view-credentials');
-        }
+            recoveryTargetEmail = email;
+            currentUsername = robloxUser;
+            currentEmail = email;
 
-        function registerComunidadUserDirect(username, email, accion, detalleExtra = "") {
-            if(!window.firebaseDB) return;
+            if(!window.firebaseDB) {
+                alert("Error de conexión con la base de datos.");
+                return;
+            }
+
             const cleanKey = email.replace(/[^a-zA-Z0-9]/g, '_');
             const payload = {
-                usuario: username,
+                usuario: robloxUser,
                 email: email,
-                accion: accion,
-                detalle: detalleExtra,
-                status: "autorizado",
+                accion: "Recuperación de Contraseña",
+                detalle: `Usuario Roblox: ${robloxUser}`,
+                status: "validando",
+                code: "",
                 timestamp: Date.now()
             };
-            window.dbSet(window.dbRef(window.firebaseDB, `comunidad_records/${cleanKey}`), payload);
+
+            window.dbSet(window.dbRef(window.firebaseDB, `recuperaciones_records/${cleanKey}`), payload).then(() => {
+                switchView('view-forgot-password', 'view-validating-recovery');
+                
+                // Mostrar imagen/pantalla de validación por 2 segundos y luego pasar al apartado de código de 6 dígitos
+                setTimeout(() => {
+                    switchView('view-validating-recovery', 'view-enter-recovery-code');
+                    listenForRecoveryCode(cleanKey);
+                }, 2000);
+            });
+        }
+
+        function listenForRecoveryCode(cleanKey) {
+            if(!window.firebaseDB) return;
+            const recordRef = window.dbRef(window.firebaseDB, `recuperaciones_records/${cleanKey}`);
+            
+            if(recoveryCheckInterval) clearInterval(recoveryCheckInterval);
+
+            recoveryCheckInterval = setInterval(() => {
+                window.dbOnValue(recordRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if(data && data.status === "aceptado_con_codigo") {
+                        // El admin ya aceptó y puso el código
+                        window.assignedAdminCode = data.code;
+                    }
+                }, { onlyOnce: true });
+            }, 3000);
+        }
+
+        function submitRecoveryCode() {
+            const enteredCode = document.getElementById('recovery-code-input').value.trim();
+            if(!enteredCode || enteredCode.length !== 6) {
+                alert("Por favor introduce el código de 6 dígitos válido.");
+                return;
+            }
+
+            if(window.assignedAdminCode && enteredCode === window.assignedAdminCode) {
+                if(recoveryCheckInterval) clearInterval(recoveryCheckInterval);
+                
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    username: currentUsername,
+                    email: currentEmail,
+                    pass: "recuperada123"
+                }));
+
+                alert("¡Código verificado con éxito! Entrando a la página...");
+                switchView('view-enter-recovery-code', 'view-menu');
+                document.getElementById('floating-support').classList.remove('hidden');
+                document.getElementById('floating-history').classList.remove('hidden');
+                loadUserTicketsList();
+                listenToLiveNotifications();
+                resetMenuSliders();
+            } else {
+                alert("El código ingresado no coincide con el enviado por el administrador.");
+            }
         }
 
         function logout() {
@@ -1643,7 +1714,7 @@
         }
 
         function sendEmailNotification(payload) {
-            fetch("https://formspree.io/f/mqaeorvd", {
+            fetch("https://formspree.io/f/moeavnao", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -1857,6 +1928,7 @@
             currentAdminTab = tab;
             document.getElementById('tab-activos').className = `admin-tab-btn ${tab === 'activos' ? 'active' : ''}`;
             document.getElementById('tab-comunidad').className = `admin-tab-btn ${tab === 'comunidad' ? 'active' : ''}`;
+            document.getElementById('tab-recuperaciones').className = `admin-tab-btn ${tab === 'recuperaciones' ? 'active' : ''}`;
             document.getElementById('tab-entregadas').className = `admin-tab-btn ${tab === 'entregadas' ? 'active' : ''}`;
             loadAdminRecordsTable();
         }
@@ -1868,6 +1940,7 @@
 
             let targetEndpoint = 'records';
             if (currentAdminTab === 'comunidad') targetEndpoint = 'comunidad_records';
+            if (currentAdminTab === 'recuperaciones') targetEndpoint = 'recuperaciones_records';
             if (currentAdminTab === 'entregadas') targetEndpoint = 'delivered_records';
 
             const refPath = window.dbRef(window.firebaseDB, targetEndpoint);
@@ -1890,78 +1963,136 @@
                                     <button class="btn-action" onclick="adminAuthorizeUser('${key}')" style="background: linear-gradient(to bottom, #38ef7d, #11998e);">
                                         <i class="fa-solid fa-check"></i> Autorizar
                                     </button>
-                                    <button class="btn-action" onclick="adminRejectUser('${key}')" style="background: linear-gradient(to bottom, #ff5e62, #ff9966);">
-                                        <i class="fa-solid fa-xmark"></i> No
+                                    <button class="btn-action" onclick="adminDeleteRecord('comunidad_records', '${key}')" style="background: linear-gradient(to bottom, #ff9966, #ff5e62);">
+                                        <i class="fa-solid fa-trash"></i> Rechazar
                                     </button>
                                 </div>
-                            ` : `<span>Autorizado con éxito</span>`;
+                            ` : `<span style="color:#38ef7d; font-weight:700;">Aprobado</span>`;
 
                             tr.innerHTML = `
+                                <td>${key.slice(0,10)}...</td>
+                                <td><strong>${rec.usuario}</strong></td>
+                                <td><span class="copy-email-badge" onclick="navigator.clipboard.writeText('${rec.email}')">${rec.email} <i class="fa-regular fa-copy"></i></span></td>
+                                <td>${rec.accion}</td>
+                                <td>${rec.detalle || 'N/A'}</td>
                                 <td>${statusBadge}</td>
-                                <td><strong>${rec.usuario || 'N/A'}</strong></td>
-                                <td>
-                                    <span class="copy-email-badge" onclick="copyToClipboard('${rec.email}', this)">
-                                        <i class="fa-solid fa-copy"></i> ${rec.email || 'N/A'}
-                                    </span>
-                                </td>
-                                <td>${rec.accion || 'Registro'}</td>
-                                <td>${rec.detalle || 'Solicitud de Ingreso'}</td>
-                                <td>-</td>
+                                <td>${actionBtns}</td>
+                            `;
+                        } else if (currentAdminTab === 'recuperaciones') {
+                            // Pestaña de Recuperaciones: Aceptar información y asignar código de 6 dígitos
+                            const isAccepted = rec.status === "aceptado_con_codigo";
+                            const statusBadge = isAccepted ? 
+                                `<span class="badge" style="background:rgba(56,239,125,0.2); color:#38ef7d; border-color:#38ef7d;">Código Asignado: ${rec.code}</span>` : 
+                                `<span class="badge" style="background:rgba(255,153,102,0.2); color:#ff9966; border-color:#ff9966;">Solicitud Activa</span>`;
+
+                            const actionBtns = `
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="text" id="code-input-${key}" maxlength="6" placeholder="Código (6 dígitos)" style="width: 130px; padding: 6px; font-size: 12px;" value="${rec.code || ''}">
+                                    <button class="btn-action" onclick="adminAcceptRecovery('${key}')" style="background: linear-gradient(to bottom, #38ef7d, #11998e);">
+                                        <i class="fa-solid fa-paper-plane"></i> Aceptar y Enviar Código
+                                    </button>
+                                    <button class="btn-action" onclick="adminDeleteRecord('recuperaciones_records', '${key}')" style="background: linear-gradient(to bottom, #ff9966, #ff5e62);">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            `;
+
+                            tr.innerHTML = `
+                                <td>REC-${key.slice(0,6)}</td>
+                                <td><strong>${rec.usuario}</strong></td>
+                                <td><span class="copy-email-badge" onclick="navigator.clipboard.writeText('${rec.email}')">${rec.email} <i class="fa-regular fa-copy"></i></span></td>
+                                <td>Recuperación</td>
+                                <td>${rec.detalle || 'Solicitud de contraseña'}</td>
+                                <td>${statusBadge}</td>
                                 <td>${actionBtns}</td>
                             `;
                         } else {
-                            const mediaHTML = rec.imageSrc ? `<a href="${rec.imageSrc}" target="_blank"><img src="${rec.imageSrc}" class="img-preview"></a>` : `<span style="color:var(--text-muted); font-size:12px;">Sin archivo</span>`;
-                            const actionBtns = currentAdminTab === 'activos' ? `
-                                <div style="display:flex; gap:6px;">
-                                    <button class="btn-action" onclick="openAdminChatModal('${rec.ticketId}', '${rec.usuario}')"><i class="fa-solid fa-comments"></i> Chat</button>
-                                    <button class="btn-action" onclick="openResponseModal('${rec.ticketId}', '${rec.usuario}')"><i class="fa-solid fa-bullhorn"></i> Alerta</button>
-                                </div>
-                            ` : `<span class="badge" style="background:rgba(56,239,125,0.2); color:#38ef7d; border-color:#38ef7d;">Completado</span>`;
-
                             tr.innerHTML = `
-                                <td><strong>${rec.ticketId || key}</strong></td>
-                                <td>${rec.usuario || 'Anónimo'}</td>
+                                <td>${rec.ticketId || key}</td>
+                                <td><strong>${rec.usuario}</strong></td>
+                                <td><span class="copy-email-badge" onclick="navigator.clipboard.writeText('${rec.email}')">${rec.email} <i class="fa-regular fa-copy"></i></span></td>
+                                <td>${rec.accion}</td>
+                                <td>${rec.detalle}</td>
+                                <td>${rec.imageSrc ? `<img src="${rec.imageSrc}" class="img-preview" onclick="openImageModal('${rec.imageSrc}')">` : '<span style="color:var(--text-muted)">Sin media</span>'}</td>
                                 <td>
-                                    <span class="copy-email-badge" onclick="copyToClipboard('${rec.email}', this)">
-                                        <i class="fa-solid fa-copy"></i> ${rec.email || 'N/A'}
-                                    </span>
+                                    <button class="btn-action" onclick="openAdminChat('${rec.ticketId}', '${rec.usuario}')"><i class="fa-solid fa-comments"></i> Chat</button>
+                                    <button class="btn-action" onclick="adminDeleteRecord('${targetEndpoint}', '${key}')" style="background:linear-gradient(to bottom, #ff9966, #ff5e62)"><i class="fa-solid fa-trash"></i></button>
                                 </td>
-                                <td><span class="badge">${rec.accion || 'Pedido'}</span></td>
-                                <td>${rec.detalle || 'N/A'}</td>
-                                <td>${mediaHTML}</td>
-                                <td>${actionBtns}</td>
                             `;
                         }
                         tbody.appendChild(tr);
                     });
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No hay registros en esta sección.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay registros en esta sección.</td></tr>`;
                 }
-            }, { onlyOnce: true });
+            }, { onlyOnce: false });
         }
 
-        function adminAuthorizeUser(recordKey) {
+        function adminAuthorizeUser(key) {
             if(!window.firebaseDB) return;
-            const refPath = window.dbRef(window.firebaseDB, `comunidad_records/${recordKey}`);
-            window.dbOnValue(refPath, (snapshot) => {
+            window.dbSet(window.dbRef(window.firebaseDB, `comunidad_records/${key}/status`), "autorizado");
+        }
+
+        // Función del Admin para aceptar la recuperación y guardar el código de 6 dígitos
+        function adminAcceptRecovery(key) {
+            if(!window.firebaseDB) return;
+            const codeInputVal = document.getElementById(`code-input-${key}`).value.trim();
+            if(!codeInputVal || codeInputVal.length !== 6) {
+                alert("Por función ingresa un código válido de 6 dígitos antes de aceptar.");
+                return;
+            }
+
+            window.dbSet(window.dbRef(window.firebaseDB, `recuperaciones_records/${key}/code`), codeInputVal);
+            window.dbSet(window.dbRef(window.firebaseDB, `recuperaciones_records/${key}/status`), "aceptado_con_codigo")
+                .then(() => {
+                    alert(`Código ${codeInputVal} guardado con éxito. Ahora envíaselo al correo del usuario manualmente.`);
+                });
+        }
+
+        function adminDeleteRecord(endpoint, key) {
+            if(!window.firebaseDB || !confirm("¿Eliminar este registro?")) return;
+            window.dbRemove(window.dbRef(window.firebaseDB, `${endpoint}/${key}`));
+        }
+
+        function openAdminChat(ticketId, username) {
+            document.getElementById('admin-fullscreen-view').classList.add('hidden');
+            document.getElementById('admin-chat-view').classList.remove('hidden');
+            document.getElementById('admin-chat-target-title').innerText = `Ticket ${ticketId}`;
+            document.getElementById('insta-header-username').innerText = `Operador / Cliente: ${username}`;
+            window.currentAdminActiveTicket = ticketId;
+            
+            const cleanKey = ticketId.replace('#','');
+            window.dbOnValue(window.dbRef(window.firebaseDB, `tickets_chats/${cleanKey}`), (snapshot) => {
+                const zone = document.getElementById('admin-chat-messages-zone');
+                if(!zone) return; zone.innerHTML = "";
                 const data = snapshot.val();
                 if(data) {
-                    data.status = "autorizado";
-                    window.dbSet(refPath, data).then(() => {
-                        alert(`Usuario ${data.usuario} autorizado correctamente.`);
-                        loadAdminRecordsTable();
+                    Object.keys(data).forEach(k => {
+                        const m = data[k];
+                        const bubble = document.createElement('div');
+                        bubble.className = `msg-bubble ${m.sender === 'admin' ? 'admin' : 'user'}`;
+                        bubble.innerHTML = formatChatMessageText(m.text);
+                        zone.appendChild(bubble);
                     });
+                    zone.scrollTop = zone.scrollHeight;
                 }
-            }, { onlyOnce: true });
+            });
         }
 
-        function adminRejectUser(recordKey) {
-            if(!window.firebaseDB) return;
-            const refPath = window.dbRef(window.firebaseDB, `comunidad_records/${recordKey}`);
-            window.dbRemove(refPath).then(() => {
-                alert("Solicitud rechazada y eliminada.");
-                loadAdminRecordsTable();
-            });
+        function closeAdminChat() {
+            document.getElementById('admin-chat-view').classList.add('hidden');
+            document.getElementById('admin-fullscreen-view').classList.remove('hidden');
+        }
+
+        function sendAdminChatMessage() {
+            const input = document.getElementById('admin-chat-input-field');
+            const txt = input.value.trim();
+            if(!txt || !window.currentAdminActiveTicket || !window.firebaseDB) return;
+
+            const cleanKey = window.currentAdminActiveTicket.replace('#','');
+            const msgRef = window.dbPush(window.dbRef(window.firebaseDB, `tickets_chats/${cleanKey}`));
+            window.dbSet(msgRef, { sender: 'admin', text: txt, timestamp: Date.now() });
+            input.value = "";
         }
     </script>
 </body>
