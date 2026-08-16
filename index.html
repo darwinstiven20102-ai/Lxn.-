@@ -729,7 +729,7 @@
     }
 
     /* =========================================================
-       MODAL DE EDICIÓN ESTILO FRUTIGER AERO (PROPIO DE LA PÁGINA)
+       MODAL DE EDICIÓN ESTILO FRUTIGER AERO
        ========================================================= */
     .modal-backdrop {
       display: none;
@@ -826,7 +826,6 @@
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 10px rgba(0, 168, 255, 0.5);
     }
 
-    /* Opciones personalizadas de colores y tendencias con diseño Aero */
     .color-options-grid, .trend-options-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1043,7 +1042,7 @@
     </div>
   </div>
 
-  <!-- Modal Edición (Estilo propio Frutiger Aero con colores personalizados) -->
+  <!-- Modal Edición -->
   <div id="editModal" class="modal-backdrop">
     <div class="modal-wrapper-edit">
       <h3 style="margin-bottom:14px; color:#0c2461; text-align:center; font-family:'Quicksand',sans-serif; font-size:1.15rem; font-weight:800; text-shadow:0 1px 1px rgba(255,255,255,0.8);">Editar Ítem - Moonshop</h3>
@@ -1118,7 +1117,6 @@
     </div>
   </div>
 
-  <!-- SCRIPT FIREBASE Y LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1160,16 +1158,23 @@
     let currentDetailId = null;
     let toastTimeout = null;
 
+    const TARGET_ITEMS_COUNT = 121; // Fijado exactamente en 121 productos
+
     const itemsRef = ref(db, 'items');
     onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();
+      let currentItems = [];
+
       if (data) {
-        itemsData = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
-        renderCatalog(itemsData);
-      } else {
-        const defaultItems = [];
+        currentItems = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+      }
+
+      // Si la base de datos tiene menos de 121 elementos, expande automáticamente el catálogo
+      if (currentItems.length < TARGET_ITEMS_COUNT) {
         const trends = ['up', 'down', 'equal', 'fluct'];
-        for (let i = 1; i <= 80; i++) {
+        const startFrom = currentItems.length + 1;
+
+        for (let i = startFrom; i <= TARGET_ITEMS_COUNT; i++) {
           const price = Math.floor(Math.random() * 480) + 20;
           const oldPrice = price + Math.floor(Math.random() * 100) + 20;
           const trend = trends[Math.floor(Math.random() * trends.length)];
@@ -1179,7 +1184,7 @@
           else if (price >= 260 && price < 380) circleColor = '#ff9f43';
           else if (price >= 380) circleColor = '#e84118';
 
-          defaultItems.push({
+          currentItems.push({
             id: i,
             name: `Producto #${i}`,
             price: price,
@@ -1189,8 +1194,11 @@
             imageText: "Precio Inestable"
           });
         }
-        set(ref(db, 'items'), defaultItems);
+        set(ref(db, 'items'), currentItems);
       }
+
+      itemsData = currentItems;
+      renderCatalog(itemsData);
     });
 
     function formatNumber(value) {
@@ -1201,7 +1209,6 @@
       return num.toLocaleString('es-CO');
     }
 
-    // Generador de SVG con escalones (escala) y montañitas amarillas
     function getChartSVG(trend, id, isDetail = false) {
       const width = 100;
       const height = 30;
