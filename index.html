@@ -434,13 +434,14 @@
       font-weight: 800;
     }
 
+    /* Colores y tendencias */
     .trend-up {
-      color: #009432;
+      color: #ea2027;
       text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .trend-down {
-      color: #ea2027;
+      color: #009432;
       text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
@@ -449,10 +450,48 @@
       text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
+    .trend-fluct {
+      color: #fbc531;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
     svg.sparkline {
       width: 52px;
       height: 20px;
       filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15));
+    }
+
+    /* Controles de Ítem (+ / -) */
+    .item-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .qty-btn {
+      width: 20px;
+      height: 16px;
+      border-radius: 6px;
+      border: 1px solid #fff;
+      background: linear-gradient(180deg, #74b9ff 0%, #0984e3 100%);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.1s;
+    }
+
+    .qty-btn:active {
+      transform: scale(0.9);
+    }
+
+    .qty-btn.minus {
+      background: linear-gradient(180deg, #ff7675 0%, #d63031 100%);
     }
 
     /* Botón Lápiz de Edición */
@@ -478,7 +517,219 @@
     }
 
     /* =========================================================
-       ANIMACIONES DE MODAL Y ESTÉTICA DETALLADA
+       BURBUJA FLOTANTE DEL CARRITO ($) Y MINI TOAST
+       ========================================================= */
+    .floating-cart-bubble {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      background: radial-gradient(circle at 35% 30%, #ffffff 0%, #74b9ff 40%, #0984e3 85%, #006266 100%);
+      border-radius: 50%;
+      box-shadow: 
+        0 6px 18px rgba(9, 132, 227, 0.4),
+        inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.9);
+      border: 2px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      cursor: pointer;
+      z-index: 999;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .mini-toast {
+      position: fixed;
+      bottom: 28px;
+      right: 76px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 6px 12px;
+      border-radius: 14px;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 6px 20px rgba(10, 61, 98, 0.25);
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #0c2461;
+      z-index: 1000;
+      pointer-events: none;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateX(10px) scale(0.9);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .mini-toast.show {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+
+    .floating-cart-bubble.has-items {
+      animation: subtleExplosion 2.5s infinite ease-out;
+    }
+
+    @keyframes subtleExplosion {
+      0% {
+        box-shadow: 
+          0 6px 18px rgba(9, 132, 227, 0.4),
+          inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+          inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+          0 0 0 0 rgba(116, 185, 255, 0.5);
+      }
+      70% {
+        box-shadow: 
+          0 6px 18px rgba(9, 132, 227, 0.4),
+          inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+          inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+          0 0 0 10px rgba(116, 185, 255, 0);
+      }
+      100% {
+        box-shadow: 
+          0 6px 18px rgba(9, 132, 227, 0.4),
+          inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+          inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+          0 0 0 0 rgba(116, 185, 255, 0);
+      }
+    }
+
+    .floating-cart-bubble:hover {
+      transform: scale(1.1);
+    }
+
+    .cart-panel {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 12px 35px rgba(10, 61, 98, 0.3);
+      z-index: 998;
+      flex-direction: column;
+      overflow: hidden;
+      animation: fadeInUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.3s ease;
+    }
+
+    .cart-panel.has-items-panel {
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    .cart-panel.active {
+      display: flex;
+    }
+
+    @keyframes fadeInUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .cart-header {
+      padding: 10px 14px;
+      background: rgba(116, 185, 255, 0.3);
+      font-weight: 800;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-items-list {
+      padding: 10px;
+      overflow-y: auto;
+      max-height: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cart-item-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 6px 8px;
+      border-radius: 12px;
+      border: 1px solid #fff;
+    }
+
+    .cart-item-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #74b9ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: 0.5rem;
+      color: #fff;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .cart-item-info {
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .cart-item-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #0c2461;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cart-item-price {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #0984e3;
+    }
+
+    .cart-footer {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.8);
+      font-weight: 900;
+      font-size: 0.9rem;
+      text-align: center;
+      color: #0c2461;
+    }
+
+    .flying-item {
+      position: fixed;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #74b9ff;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 9999;
+      pointer-events: none;
+      transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* =========================================================
+       MODAL DE EDICIÓN ESTILO FRUTIGER AERO (PROPIO DE LA PÁGINA)
        ========================================================= */
     .modal-backdrop {
       display: none;
@@ -488,14 +739,12 @@
       width: 100%;
       height: 100%;
       background: rgba(8, 28, 60, 0.45);
-      backdrop-filter: blur(0px);
-      -webkit-backdrop-filter: blur(0px);
       z-index: 1000;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      transition: opacity 0.3s ease;
       opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .modal-backdrop.active {
@@ -522,20 +771,25 @@
     }
 
     .modal-wrapper-edit {
-      background: rgba(255, 255, 255, 0.92);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(220, 242, 255, 0.8) 50%, rgba(195, 235, 255, 0.88) 100%);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       padding: 20px;
-      border-radius: 24px;
+      border-radius: 26px;
       width: 100%;
-      max-width: 380px;
-      box-shadow: 0 15px 35px rgba(10, 61, 98, 0.35), inset 0 2px 4px #ffffff;
-      border: 2px solid #ffffff;
+      max-width: 390px;
+      box-shadow: 
+        0 15px 35px rgba(10, 61, 98, 0.35),
+        0 0 25px rgba(116, 185, 255, 0.5),
+        inset 0 2px 4px #ffffff,
+        inset 0 -2px 6px rgba(0, 84, 166, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.95);
       max-height: 90vh;
       overflow-y: auto;
       transform: scale(0.7) translateY(40px);
       opacity: 0;
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+      position: relative;
     }
 
     .modal-backdrop.active .modal-wrapper-edit {
@@ -543,7 +797,70 @@
       opacity: 1;
     }
 
-    /* ESTILOS DE LA VISTA DETALLADA DEL ÍTEM CON REFLEJO GLOSSY */
+    .edit-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #0c2461;
+      margin-bottom: 4px;
+      display: block;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .edit-input {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #0a3d62;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .edit-input:focus {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 10px rgba(0, 168, 255, 0.5);
+    }
+
+    /* Opciones personalizadas de colores y tendencias con diseño Aero */
+    .color-options-grid, .trend-options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .custom-option-btn {
+      padding: 8px 10px;
+      border-radius: 14px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08), inset 0 1px 2px rgba(255,255,255,0.9);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .custom-option-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .custom-option-btn.active {
+      background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(230,245,255,1) 100%);
+      border-color: #0984e3;
+      box-shadow: 0 4px 12px rgba(9, 132, 227, 0.35), inset 0 1px 3px rgba(255,255,255,1);
+    }
+
     .detail-card-design {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(230, 245, 255, 0.75) 50%, rgba(200, 235, 255, 0.85) 100%);
       backdrop-filter: blur(20px);
@@ -562,40 +879,6 @@
       position: relative;
       overflow: hidden;
       width: 100%;
-    }
-
-    /* Brillo dinámico de barrido al abrir */
-    .detail-card-design::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -150%;
-      width: 100%;
-      height: 200%;
-      background: linear-gradient(60deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
-      transform: rotate(25deg);
-      pointer-events: none;
-    }
-
-    .modal-backdrop.active .detail-card-design::after {
-      animation: shineSweep 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards 0.2s;
-    }
-
-    @keyframes shineSweep {
-      0% { left: -150%; }
-      100% { left: 150%; }
-    }
-
-    .detail-card-design::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 42%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%);
-      border-radius: 24px 24px 100% 100%;
-      pointer-events: none;
     }
 
     .detail-image-large {
@@ -619,12 +902,6 @@
       position: relative;
       overflow: hidden;
       word-break: break-all;
-      animation: floatImage 4s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatImage {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-4px); }
     }
 
     .detail-item-name {
@@ -634,7 +911,6 @@
       color: #0a3d62;
       text-align: center;
       text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-      letter-spacing: -0.2px;
     }
 
     .detail-price-box {
@@ -665,12 +941,6 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .download-btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 2px 8px rgba(9, 132, 227, 0.3);
     }
 
     .close-btn {
@@ -684,11 +954,6 @@
       cursor: pointer;
       font-size: 0.82rem;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-      transition: background 0.15s ease;
-    }
-
-    .close-btn:active {
-      background: rgba(230, 240, 255, 0.95);
     }
 
     .footer-status {
@@ -729,92 +994,135 @@
         <input type="text" id="searchInput" class="search-input" placeholder="Buscar producto en Moonshop...">
       </div>
       <div class="filter-pills">
-        <button class="pill-btn active" onclick="filterItems('all', this)">🌐 Todos</button>
-        <button class="pill-btn" onclick="filterItems('up', this)">📈 En Alza</button>
-        <button class="pill-btn" onclick="filterItems('down', this)">📉 En Baja</button>
-        <button class="pill-btn" onclick="filterItems('equal', this)">➡️ Estable</button>
-        <button class="pill-btn" onclick="filterItems('cheap', this)">💎 Económicos</button>
+        <button class="pill-btn active" onclick="filterItems('all', this)"> Todos</button>
+        <button class="pill-btn" onclick="filterItems('up', this)">En Alza</button>
+        <button class="pill-btn" onclick="filterItems('down', this)"> En Baja</button>
+        <button class="pill-btn" onclick="filterItems('equal', this)"> Estable</button>
+        <button class="pill-btn" onclick="filterItems('fluct', this)"> Fluctuante</button>
+        <button class="pill-btn" onclick="filterItems('cheap', this)"> Económicos</button>
       </div>
     </div>
 
     <main class="catalog-grid" id="catalog"></main>
 
     <footer class="footer-status">
-      MOONSHOP Aero Glass • Optimizado para Pantallas Android
+      MOONSHOP • service
     </footer>
 
   </div>
 
-  <!-- Modal de Detalle de Ítem -->
-  <div id="detailModal" class="modal-backdrop">
-    <div class="modal-wrapper">
-      
-      <!-- Contenedor editable/descargable del ítem -->
-      <div id="detailCardContainer" class="detail-card-design">
-        <!-- Contenido generado dinámicamente -->
-      </div>
-
-      <!-- Botón Descargar Información -->
-      <button type="button" class="download-btn" onclick="downloadItemInfo()">
-        📥 Descargar información
-      </button>
-
-      <button type="button" class="close-btn" onclick="closeDetailModal()">
-        Cerrar
-      </button>
-
+  <!-- Burbuja Flotante y Mini Toast -->
+  <div class="floating-cart-bubble" id="floatingCartBubble" onclick="toggleCartPanel()">$</div>
+  <div class="mini-toast" id="miniToast">Item agregado</div>
+  
+  <!-- Panel Desplegable -->
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-header">
+      <span>Items en Burbuja</span>
+      <span style="cursor:pointer;" onclick="toggleCartPanel()">✕</span>
+    </div>
+    <div class="cart-items-list" id="cartItemsList">
+      <div style="text-align:center; color:#636e72; font-size:0.75rem; font-weight:700; padding:20px;">No hay items agregados</div>
+    </div>
+    <div class="cart-footer" id="cartTotalFooter">
+      Total: $0
     </div>
   </div>
 
-  <!-- Modal de Edición de Ítem -->
+  <!-- Modal Detalle -->
+  <div id="detailModal" class="modal-backdrop">
+    <div class="modal-wrapper">
+      <div id="detailCardContainer" class="detail-card-design"></div>
+      <div id="detailChartContainer" style="width: 100%;"></div>
+      <button type="button" class="download-btn" onclick="downloadItemInfo()">
+        📥 Descargar información
+      </button>
+      <button type="button" class="close-btn" onclick="closeDetailModal()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Edición (Estilo propio Frutiger Aero con colores personalizados) -->
   <div id="editModal" class="modal-backdrop">
     <div class="modal-wrapper-edit">
-      <h3 style="margin-bottom:12px; color:#0c2461; text-align:center; font-family:'Quicksand',sans-serif; font-size:1.1rem; font-weight:800;">Editar Ítem</h3>
-      <form id="editForm" style="display:flex; flex-direction:column; gap:10px;">
+      <h3 style="margin-bottom:14px; color:#0c2461; text-align:center; font-family:'Quicksand',sans-serif; font-size:1.15rem; font-weight:800; text-shadow:0 1px 1px rgba(255,255,255,0.8);">Editar Ítem - Moonshop</h3>
+      <form id="editForm" style="display:flex; flex-direction:column; gap:11px;">
         <input type="hidden" id="editIndex">
         <div>
-          <label style="font-size:0.7rem; font-weight:800; color:#0c2461;">1. Foto (Galería o URL / Emoji):</label>
+          <label class="edit-label">1. Foto (Galería o URL / Emoji):</label>
           <input type="file" id="editImageFile" accept="image/*" style="width:100%; margin-bottom:5px; font-size:0.75rem;">
-          <input type="text" id="editImageText" placeholder="o Escribe Texto / Emoji / URL" style="width:100%; padding:7px 10px; border-radius:10px; border:1px solid #ccc; font-weight:700; font-size:0.8rem;">
+          <input type="text" id="editImageText" class="edit-input" placeholder="o Escribe Texto / Emoji / URL">
         </div>
         <div>
-          <label style="font-size:0.7rem; font-weight:800; color:#0c2461;">2. Nombre:</label>
-          <input type="text" id="editName" style="width:100%; padding:7px 10px; border-radius:10px; border:1px solid #ccc; font-weight:700; font-size:0.8rem;">
+          <label class="edit-label">2. Nombre:</label>
+          <input type="text" id="editName" class="edit-input">
         </div>
         <div>
-          <label style="font-size:0.7rem; font-weight:800; color:#0c2461;">3. Precio Actual ($):</label>
-          <input type="text" id="editPrice" style="width:100%; padding:7px 10px; border-radius:10px; border:1px solid #ccc; font-weight:700; font-size:0.8rem;">
+          <label class="edit-label">3. Precio Actual ($):</label>
+          <input type="text" id="editPrice" class="edit-input">
         </div>
         <div>
-          <label style="font-size:0.7rem; font-weight:800; color:#0c2461;">4. Precio Antiguo ($):</label>
-          <input type="text" id="editOldPrice" placeholder="Opcional (Ej. 1000)" style="width:100%; padding:7px 10px; border-radius:10px; border:1px solid #ccc; font-weight:700; font-size:0.8rem;">
+          <label class="edit-label">4. Precio Antiguo ($):</label>
+          <input type="text" id="editOldPrice" class="edit-input" placeholder="Opcional (Ej. 1000)">
         </div>
         <div>
-          <label style="font-size:0.7rem; font-weight:800; color:#0c2461;">5. Color de la bolita:</label>
-          <input type="color" id="editColor" style="width:100%; height:32px; border-radius:8px; border:1px solid #ccc; cursor:pointer; background:none;">
+          <label class="edit-label">5. Color de la bolita:</label>
+          <input type="hidden" id="editColorVal" value="#fbc531">
+          <div class="color-options-grid">
+            <button type="button" class="custom-option-btn" onclick="selectEditColor('#fbc531', this)" data-color="#fbc531">
+              <span class="color-circle" style="background-color: #fbc531;"></span>
+              <span style="color: #b38600; font-weight: 800;">Amarillo</span>
+            </button>
+            <button type="button" class="custom-option-btn" onclick="selectEditColor('#ff9f43', this)" data-color="#ff9f43">
+              <span class="color-circle" style="background-color: #ff9f43;"></span>
+              <span style="color: #d35400; font-weight: 800;">Naranja</span>
+            </button>
+            <button type="button" class="custom-option-btn" onclick="selectEditColor('#e84118', this)" data-color="#e84118">
+              <span class="color-circle" style="background-color: #e84118;"></span>
+              <span style="color: #e84118; font-weight: 800;">Rojo</span>
+            </button>
+            <button type="button" class="custom-option-btn" onclick="selectEditColor('#4cd137', this)" data-color="#4cd137">
+              <span class="color-circle" style="background-color: #4cd137;"></span>
+              <span style="color: #27ae60; font-weight: 800;">Verde</span>
+            </button>
+          </div>
         </div>
         <div>
-          <label style="font-size:0.7rem; font-weight:800; color:#0c2461;">6. Estado (Subió / Bajó / Estable):</label>
-          <select id="editTrend" style="width:100%; padding:7px 10px; border-radius:10px; border:1px solid #ccc; font-weight:700; font-size:0.8rem;">
-            <option value="up">📈 Subió (Alza)</option>
-            <option value="down">📉 Bajó (Baja)</option>
-            <option value="equal">➡️ Estable (Ni sube ni baja)</option>
-          </select>
+          <label class="edit-label">6. Tendencia / Gráfica:</label>
+          <input type="hidden" id="editTrendVal" value="up">
+          <div class="trend-options-grid">
+            <button type="button" class="custom-option-btn" onclick="selectEditTrend('up', this)" data-trend="up">
+              <span style="color: #ea2027; font-weight: 900;">📈</span>
+              <span style="color: #ea2027; font-weight: 800;">Alza (Subió)</span>
+            </button>
+            <button type="button" class="custom-option-btn" onclick="selectEditTrend('down', this)" data-trend="down">
+              <span style="color: #009432; font-weight: 900;">📉</span>
+              <span style="color: #009432; font-weight: 800;">Baja (Bajó)</span>
+            </button>
+            <button type="button" class="custom-option-btn" onclick="selectEditTrend('equal', this)" data-trend="equal">
+              <span style="color: #f39c12; font-weight: 900;">➡️</span>
+              <span style="color: #f39c12; font-weight: 800;">Estable</span>
+            </button>
+            <button type="button" class="custom-option-btn" onclick="selectEditTrend('fluct', this)" data-trend="fluct">
+              <span style="color: #fbc531; font-weight: 900;">🟡</span>
+              <span style="color: #b38600; font-weight: 800;">Fluctuante</span>
+            </button>
+          </div>
         </div>
-        <div style="display:flex; gap:8px; margin-top:8px;">
-          <button type="button" onclick="closeEditModal()" style="flex:1; padding:9px; border-radius:10px; border:none; background:#ccc; font-weight:800; cursor:pointer; font-size:0.8rem;">Cancelar</button>
-          <button type="submit" style="flex:1; padding:9px; border-radius:10px; border:none; background:#0984e3; color:#fff; font-weight:800; cursor:pointer; font-size:0.8rem;">Guardar</button>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button type="button" onclick="closeEditModal()" style="flex:1; padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,0.9); background:rgba(255,255,255,0.7); font-weight:800; color:#0c2461; cursor:pointer; font-size:0.82rem; box-shadow:0 3px 8px rgba(0,0,0,0.1);">Cancelar</button>
+          <button type="submit" style="flex:1; padding:10px; border-radius:14px; border:1px solid #fff; background:linear-gradient(180deg, #74b9ff 0%, #0984e3 50%, #006266 100%); color:#fff; font-weight:800; cursor:pointer; font-size:0.82rem; box-shadow:0 4px 12px rgba(9,132,227,0.4);">Guardar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- FIREBASE INTEGRATION & LOGIC SCRIPT -->
+  <!-- SCRIPT FIREBASE Y LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Tu configuración de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyB10E5NcOAHrSWG2KYh9eYo5cKJ0uegAtk",
       authDomain: "moon-shop-1b1ab.firebaseapp.com",
@@ -826,38 +1134,32 @@
       measurementId: "G-3RXRZ5P865"
     };
 
-    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Burbujas de fondo
     const bubbleContainer = document.getElementById('bubbleContainer');
-    const bubbleCount = 14;
-
-    for (let i = 0; i < bubbleCount; i++) {
+    for (let i = 0; i < 14; i++) {
       const bubble = document.createElement('div');
       bubble.classList.add('bubble');
-      
       const size = Math.floor(Math.random() * 40) + 15;
       const left = Math.random() * 100;
       const delay = Math.random() * 12;
       const duration = Math.random() * 8 + 10;
-
       bubble.style.width = `${size}px`;
       bubble.style.height = `${size}px`;
       bubble.style.left = `${left}%`;
       bubble.style.animationDelay = `${delay}s`;
       bubble.style.animationDuration = `${duration}s`;
-
       bubbleContainer.appendChild(bubble);
     }
 
     const catalogContainer = document.getElementById('catalog');
     let itemsData = [];
+    let cartItems = [];
     let currentEditId = null;
     let currentDetailId = null;
+    let toastTimeout = null;
 
-    // Escuchar cambios en la base de datos en tiempo real
     const itemsRef = ref(db, 'items');
     onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();
@@ -866,20 +1168,16 @@
         renderCatalog(itemsData);
       } else {
         const defaultItems = [];
+        const trends = ['up', 'down', 'equal', 'fluct'];
         for (let i = 1; i <= 80; i++) {
           const price = Math.floor(Math.random() * 480) + 20;
           const oldPrice = price + Math.floor(Math.random() * 100) + 20;
-          const trendVal = Math.random();
-          let trend = 'up';
-          if (trendVal < 0.33) trend = 'down';
-          else if (trendVal < 0.66) trend = 'equal';
+          const trend = trends[Math.floor(Math.random() * trends.length)];
 
           let circleColor = '#4cd137';
-          if (price >= 150 && price <= 350) {
-            circleColor = '#fbc531';
-          } else if (price > 350) {
-            circleColor = '#e84118';
-          }
+          if (price >= 130 && price < 260) circleColor = '#fbc531';
+          else if (price >= 260 && price < 380) circleColor = '#ff9f43';
+          else if (price >= 380) circleColor = '#e84118';
 
           defaultItems.push({
             id: i,
@@ -903,6 +1201,43 @@
       return num.toLocaleString('es-CO');
     }
 
+    // Generador de SVG con escalones (escala) y montañitas amarillas
+    function getChartSVG(trend, id, isDetail = false) {
+      const width = 100;
+      const height = 30;
+      let strokeColor = '#ea2027';
+      let points = '';
+      let gradId = `grad_${trend}_${id}_${isDetail}`;
+
+      if (trend === 'up') {
+        strokeColor = '#ea2027';
+        points = "0,26 15,26 15,21 30,21 30,16 45,16 45,11 60,11 60,6 75,6 75,3 100,3";
+      } else if (trend === 'down') {
+        strokeColor = '#4cd137';
+        points = "0,4 15,4 15,9 30,9 30,14 45,14 45,19 60,19 60,24 75,24 75,27 100,27";
+      } else if (trend === 'fluct') {
+        strokeColor = '#fbc531';
+        points = "0,18 12,18 12,12 24,12 24,20 36,20 36,10 48,10 48,18 60,18 60,12 72,12 72,20 84,20 84,14 100,14";
+      } else {
+        strokeColor = '#f39c12';
+        points = "0,15 20,15 20,12 40,12 40,18 60,18 60,15 80,15 80,15 100,15";
+      }
+
+      const polygonPoints = `${points} 100,30 0,30`;
+      const svgStyle = isDetail ? "width:80px; height:28px;" : "";
+
+      return `<svg class="sparkline" viewBox="0 0 ${width} ${height}" style="${svgStyle}">
+          <defs>
+            <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${strokeColor}" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="${strokeColor}" stop-opacity="0.0"/>
+            </linearGradient>
+          </defs>
+          <polyline fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" points="${points}"/>
+          <polygon fill="url(#${gradId})" points="${polygonPoints}"/>
+         </svg>`;
+    }
+
     function renderCatalog(items) {
       catalogContainer.innerHTML = '';
 
@@ -915,52 +1250,25 @@
       }
 
       items.forEach(item => {
-        const currentTrend = item.trend ? item.trend : (item.isUp ? 'up' : 'down');
-
-        let chartSvg = '';
+        const trend = item.trend || (item.isUp ? 'up' : 'down');
         let trendLabel = '';
         let trendClass = '';
 
-        if (currentTrend === 'up') {
+        if (trend === 'up') {
           trendClass = 'trend-up';
           trendLabel = '▲ Alza';
-          chartSvg = `<svg class="sparkline" viewBox="0 0 100 30">
-              <defs>
-                <linearGradient id="gradUp${item.id}" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#4cd137" stop-opacity="0.6"/>
-                  <stop offset="100%" stop-color="#4cd137" stop-opacity="0.0"/>
-                </linearGradient>
-              </defs>
-              <polyline fill="none" stroke="#4cd137" stroke-width="3" stroke-linecap="round" points="0,24 25,18 50,14 75,8 100,2"/>
-              <polygon fill="url(#gradUp${item.id})" points="0,24 25,18 50,14 75,8 100,2 100,30 0,30"/>
-             </svg>`;
-        } else if (currentTrend === 'down') {
+        } else if (trend === 'down') {
           trendClass = 'trend-down';
           trendLabel = '▼ Baja';
-          chartSvg = `<svg class="sparkline" viewBox="0 0 100 30">
-              <defs>
-                <linearGradient id="gradDown${item.id}" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#ea2027" stop-opacity="0.6"/>
-                  <stop offset="100%" stop-color="#ea2027" stop-opacity="0.0"/>
-                </linearGradient>
-              </defs>
-              <polyline fill="none" stroke="#ea2027" stroke-width="3" stroke-linecap="round" points="0,4 25,10 50,16 75,22 100,28"/>
-              <polygon fill="url(#gradDown${item.id})" points="0,4 25,10 50,16 75,22 100,28 100,30 0,30"/>
-             </svg>`;
+        } else if (trend === 'fluct') {
+          trendClass = 'trend-fluct';
+          trendLabel = '⛰️ Fluctuante';
         } else {
           trendClass = 'trend-equal';
           trendLabel = '➡️ Estable';
-          chartSvg = `<svg class="sparkline" viewBox="0 0 100 30">
-              <defs>
-                <linearGradient id="gradEq${item.id}" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#f39c12" stop-opacity="0.6"/>
-                  <stop offset="100%" stop-color="#f39c12" stop-opacity="0.0"/>
-                </linearGradient>
-              </defs>
-              <polyline fill="none" stroke="#f39c12" stroke-width="3" stroke-linecap="round" points="0,15 25,15 50,15 75,15 100,15"/>
-              <polygon fill="url(#gradEq${item.id})" points="0,15 25,15 50,15 75,15 100,15 100,30 0,30"/>
-             </svg>`;
         }
+
+        const chartSvg = getChartSVG(trend, item.id, false);
 
         const imageContent = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
           ? `<img src="${item.imageText}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">`
@@ -991,10 +1299,14 @@
                 <div class="price-container">
                   <div class="price-row">
                     <span class="item-price">$${formatNumber(item.price)}</span>
-                    <span class="color-circle" style="background-color: ${item.circleColor};" title="Color"></span>
+                    <span class="color-circle" style="background-color: ${item.circleColor};"></span>
                   </div>
                   ${oldPriceHTML}
                   ${savingsHTML}
+                  <div class="item-controls" onclick="event.stopPropagation()">
+                    <button class="qty-btn" onclick="addItemToCart(${item.id}, event)">+</button>
+                    <button class="qty-btn minus" onclick="removeItemFromCart(${item.id})">-</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1011,58 +1323,129 @@
       });
     }
 
-    // Modal para ver detalle del Ítem y descargarlo
+    window.toggleCartPanel = function() {
+      const panel = document.getElementById('cartPanel');
+      panel.classList.toggle('active');
+    }
+
+    window.addItemToCart = function(id, event) {
+      const item = itemsData.find(i => i.id === id);
+      if (!item) return;
+
+      showMiniToast(item.name);
+      const btnRect = event.target.getBoundingClientRect();
+      const bubbleRect = document.getElementById('floatingCartBubble').getBoundingClientRect();
+
+      const flyer = document.createElement('div');
+      flyer.className = 'flying-item';
+      flyer.innerHTML = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
+        ? `<img src="${item.imageText}" style="width:100%;height:100%;object-fit:cover;">`
+        : (item.imageText || '💲');
+      
+      flyer.style.left = `${btnRect.left}px`;
+      flyer.style.top = `${btnRect.top}px`;
+      document.body.appendChild(flyer);
+
+      setTimeout(() => {
+        flyer.style.left = `${bubbleRect.left + 10}px`;
+        flyer.style.top = `${bubbleRect.top + 10}px`;
+        flyer.style.transform = 'scale(0.2)';
+        flyer.style.opacity = '0';
+      }, 20);
+
+      setTimeout(() => flyer.remove(), 620);
+
+      const existing = cartItems.find(i => i.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cartItems.push({ ...item, qty: 1 });
+      }
+
+      updateCartUI();
+    }
+
+    function showMiniToast(itemName) {
+      const toast = document.getElementById('miniToast');
+      toast.innerText = `${itemName} - ¡Agregado!`;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove('show'), 1400);
+    }
+
+    window.removeItemFromCart = function(id) {
+      const index = cartItems.findIndex(i => i.id === id);
+      if (index !== -1) {
+        if (cartItems[index].qty > 1) {
+          cartItems[index].qty -= 1;
+        } else {
+          cartItems.splice(index, 1);
+        }
+      }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const listContainer = document.getElementById('cartItemsList');
+      const totalFooter = document.getElementById('cartTotalFooter');
+      const bubble = document.getElementById('floatingCartBubble');
+      const panel = document.getElementById('cartPanel');
+
+      if (cartItems.length > 0) {
+        bubble.classList.add('has-items');
+        panel.classList.add('has-items-panel');
+      } else {
+        bubble.classList.remove('has-items');
+        panel.classList.remove('has-items-panel');
+      }
+
+      if (cartItems.length === 0) {
+        listContainer.innerHTML = `<div style="text-align:center; color:#636e72; font-size:0.75rem; font-weight:700; padding:20px;">No hay items agregados</div>`;
+        totalFooter.innerText = `Total: $0`;
+        return;
+      }
+
+      listContainer.innerHTML = '';
+      let grandTotal = 0;
+
+      cartItems.forEach(item => {
+        const itemTotal = (parseFloat(item.price) || 0) * item.qty;
+        grandTotal += itemTotal;
+        const imgContent = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
+          ? `<img src="${item.imageText}" style="width:100%; height:100%; object-fit:cover;">`
+          : (item.imageText || '💲');
+
+        const rowHTML = `
+          <div class="cart-item-row">
+            <div class="cart-item-img">${imgContent}</div>
+            <div class="cart-item-info">
+              <div class="cart-item-title">${item.name} (x${item.qty})</div>
+              <div class="cart-item-price">$${formatNumber(itemTotal)}</div>
+            </div>
+            <button class="qty-btn minus" onclick="removeItemFromCart(${item.id})" style="width:16px; height:14px; font-size:0.55rem;">-</button>
+          </div>
+        `;
+        listContainer.insertAdjacentHTML('beforeend', rowHTML);
+      });
+
+      totalFooter.innerText = `Total: $${formatNumber(grandTotal)}`;
+    }
+
     window.openDetailModal = function(id) {
       const item = itemsData.find(i => i.id === id);
       if (!item) return;
       currentDetailId = id;
 
-      const currentTrend = item.trend ? item.trend : (item.isUp ? 'up' : 'down');
-      let chartSvg = '';
+      const trend = item.trend || (item.isUp ? 'up' : 'down');
       let trendLabel = '';
       let trendClass = '';
 
-      if (currentTrend === 'up') {
-        trendClass = 'trend-up';
-        trendLabel = '▲ Alza';
-        chartSvg = `<svg class="sparkline" viewBox="0 0 100 30" style="width:80px; height:28px;">
-            <defs>
-              <linearGradient id="gradUpDet${item.id}" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#4cd137" stop-opacity="0.6"/>
-                <stop offset="100%" stop-color="#4cd137" stop-opacity="0.0"/>
-              </linearGradient>
-            </defs>
-            <polyline fill="none" stroke="#4cd137" stroke-width="3" stroke-linecap="round" points="0,24 25,18 50,14 75,8 100,2"/>
-            <polygon fill="url(#gradUpDet${item.id})" points="0,24 25,18 50,14 75,8 100,2 100,30 0,30"/>
-           </svg>`;
-      } else if (currentTrend === 'down') {
-        trendClass = 'trend-down';
-        trendLabel = '▼ Baja';
-        chartSvg = `<svg class="sparkline" viewBox="0 0 100 30" style="width:80px; height:28px;">
-            <defs>
-              <linearGradient id="gradDownDet${item.id}" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ea2027" stop-opacity="0.6"/>
-                <stop offset="100%" stop-color="#ea2027" stop-opacity="0.0"/>
-              </linearGradient>
-            </defs>
-            <polyline fill="none" stroke="#ea2027" stroke-width="3" stroke-linecap="round" points="0,4 25,10 50,16 75,22 100,28"/>
-            <polygon fill="url(#gradDownDet${item.id})" points="0,4 25,10 50,16 75,22 100,28 100,30 0,30"/>
-           </svg>`;
-      } else {
-        trendClass = 'trend-equal';
-        trendLabel = '➡️ Estable';
-        chartSvg = `<svg class="sparkline" viewBox="0 0 100 30" style="width:80px; height:28px;">
-            <defs>
-              <linearGradient id="gradEqDet${item.id}" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#f39c12" stop-opacity="0.6"/>
-                <stop offset="100%" stop-color="#f39c12" stop-opacity="0.0"/>
-              </linearGradient>
-            </defs>
-            <polyline fill="none" stroke="#f39c12" stroke-width="3" stroke-linecap="round" points="0,15 25,15 50,15 75,15 100,15"/>
-            <polygon fill="url(#gradEqDet${item.id})" points="0,15 25,15 50,15 75,15 100,15 100,30 0,30"/>
-           </svg>`;
-      }
+      if (trend === 'up') { trendClass = 'trend-up'; trendLabel = ' Alza'; }
+      else if (trend === 'down') { trendClass = 'trend-down'; trendLabel = ' Baja'; }
+      else if (trend === 'fluct') { trendClass = 'trend-fluct'; trendLabel = 'Fluctuante'; }
+      else { trendClass = 'trend-equal'; trendLabel = ' Estable'; }
 
+      const chartSvg = getChartSVG(trend, item.id, true);
       const imageContent = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
         ? `<img src="${item.imageText}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`
         : (item.imageText || 'Precio Inestable');
@@ -1081,19 +1464,20 @@
       }
 
       const detailCardHTML = `
-        <div class="detail-image-large">
-          ${imageContent}
-        </div>
+        <div class="detail-image-large">${imageContent}</div>
         <div class="detail-item-name">${item.name}</div>
         <div class="detail-price-box">
           <div class="price-row" style="justify-content: center; gap: 8px;">
-            <span class="item-price" style="font-size: 1.35rem; text-shadow: 0 1px 2px rgba(255,255,255,0.9);">$${formatNumber(item.price)}</span>
-            <span class="color-circle" style="background-color: ${item.circleColor}; width:15px; height:15px;" title="Color"></span>
+            <span class="item-price" style="font-size: 1.35rem;">$${formatNumber(item.price)}</span>
+            <span class="color-circle" style="background-color: ${item.circleColor}; width:15px; height:15px;"></span>
           </div>
           ${oldPriceHTML}
           ${savingsHTML}
         </div>
-        <div class="chart-container" style="width: 100%; padding: 8px 14px; margin-top: 2px; background: rgba(255, 255, 255, 0.55);">
+      `;
+
+      const detailChartHTML = `
+        <div class="chart-container" style="width: 100%; padding: 8px 14px; background: rgba(255, 255, 255, 0.55); border-radius: 16px;">
           <div class="chart-info ${trendClass}" style="font-size: 0.8rem; font-weight: 800;">
             <span>${trendLabel}</span>
           </div>
@@ -1102,13 +1486,12 @@
       `;
 
       document.getElementById('detailCardContainer').innerHTML = detailCardHTML;
-      const modal = document.getElementById('detailModal');
-      modal.classList.add('active');
+      document.getElementById('detailChartContainer').innerHTML = detailChartHTML;
+      document.getElementById('detailModal').classList.add('active');
     };
 
     window.closeDetailModal = function() {
-      const modal = document.getElementById('detailModal');
-      modal.classList.remove('active');
+      document.getElementById('detailModal').classList.remove('active');
       currentDetailId = null;
     };
 
@@ -1116,11 +1499,7 @@
       const cardElement = document.getElementById('detailCardContainer');
       if (!cardElement) return;
 
-      html2canvas(cardElement, {
-        backgroundColor: null,
-        scale: 2,
-        useCORS: true
-      }).then(canvas => {
+      html2canvas(cardElement, { backgroundColor: null, scale: 2, useCORS: true }).then(canvas => {
         const link = document.createElement('a');
         link.download = `MOONSHOP_Item_${currentDetailId || 'info'}.png`;
         link.href = canvas.toDataURL('image/png');
@@ -1128,15 +1507,11 @@
       });
     };
 
-    // Activación del modo edición al presionar 10 VECES el título MOONSHOP
     let clickCount = 0;
     let clickTimer = null;
-    const brandTitle = document.getElementById('brandTitle');
-
-    brandTitle.addEventListener('click', () => {
+    document.getElementById('brandTitle').addEventListener('click', () => {
       clickCount++;
       clearTimeout(clickTimer);
-
       if (clickCount >= 10) {
         clickCount = 0;
         document.body.classList.toggle('edit-mode');
@@ -1144,13 +1519,22 @@
         alert(activeEdit ? '¡Modo Edición Activado! Presiona el lápiz ✏️ en cualquier producto.' : 'Modo Edición Desactivado.');
         renderCatalog(itemsData);
       } else {
-        clickTimer = setTimeout(() => {
-          clickCount = 0;
-        }, 2000);
+        clickTimer = setTimeout(() => clickCount = 0, 2000);
       }
     });
 
-    // Funciones globales en window para interactuar con botones onclick
+    window.selectEditColor = function(color, btn) {
+      document.getElementById('editColorVal').value = color;
+      document.querySelectorAll('.color-options-grid .custom-option-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+
+    window.selectEditTrend = function(trend, btn) {
+      document.getElementById('editTrendVal').value = trend;
+      document.querySelectorAll('.trend-options-grid .custom-option-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+
     window.openEditModal = function(id) {
       const item = itemsData.find(i => i.id === id);
       if (!item) return;
@@ -1161,29 +1545,33 @@
       document.getElementById('editName').value = item.name;
       document.getElementById('editPrice').value = formatNumber(item.price);
       document.getElementById('editOldPrice').value = item.oldPrice ? formatNumber(item.oldPrice) : '';
-      document.getElementById('editColor').value = item.circleColor || '#4cd137';
-      document.getElementById('editTrend').value = item.trend ? item.trend : (item.isUp ? 'up' : 'down');
+      
+      const colorVal = item.circleColor || '#fbc531';
+      document.getElementById('editColorVal').value = colorVal;
+      document.querySelectorAll('.color-options-grid .custom-option-btn').forEach(b => {
+        if (b.getAttribute('data-color') === colorVal) b.classList.add('active');
+        else b.classList.remove('active');
+      });
 
-      const editModal = document.getElementById('editModal');
-      editModal.classList.add('active');
+      const trendVal = item.trend || (item.isUp ? 'up' : 'down');
+      document.getElementById('editTrendVal').value = trendVal;
+      document.querySelectorAll('.trend-options-grid .custom-option-btn').forEach(b => {
+        if (b.getAttribute('data-trend') === trendVal) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+
+      document.getElementById('editModal').classList.add('active');
     };
 
     window.closeEditModal = function() {
-      const editModal = document.getElementById('editModal');
-      editModal.classList.remove('active');
+      document.getElementById('editModal').classList.remove('active');
       currentEditId = null;
     };
 
-    // Formatear automáticamente con comas mientras el usuario escribe en los campos de precio
     function setupPriceInputFormat(elementId) {
       document.getElementById(elementId).addEventListener('input', (e) => {
-        const cursorVal = e.target.value;
-        const rawVal = cursorVal.replace(/[^0-9]/g, '');
-        if (rawVal) {
-          e.target.value = parseInt(rawVal, 10).toLocaleString('es-CO');
-        } else {
-          e.target.value = '';
-        }
+        const rawVal = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = rawVal ? parseInt(rawVal, 10).toLocaleString('es-CO') : '';
       });
     }
     setupPriceInputFormat('editPrice');
@@ -1197,6 +1585,7 @@
       const textInput = document.getElementById('editImageText').value;
       const rawPrice = document.getElementById('editPrice').value.replace(/[^0-9]/g, '');
       const rawOldPrice = document.getElementById('editOldPrice').value.replace(/[^0-9]/g, '');
+      const trendChoice = document.getElementById('editTrendVal').value;
 
       const saveItemData = (imageVal) => {
         const updatedItem = {
@@ -1205,9 +1594,9 @@
           name: document.getElementById('editName').value,
           price: parseFloat(rawPrice) || 0,
           oldPrice: rawOldPrice ? parseFloat(rawOldPrice) : 0,
-          circleColor: document.getElementById('editColor').value,
-          trend: document.getElementById('editTrend').value,
-          isUp: document.getElementById('editTrend').value === 'up'
+          circleColor: document.getElementById('editColorVal').value,
+          trend: trendChoice,
+          isUp: trendChoice === 'up'
         };
 
         set(ref(db, `items/${currentEditId - 1}`), updatedItem);
@@ -1216,9 +1605,7 @@
 
       if (fileInput.files && fileInput.files[0]) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-          saveItemData(e.target.result);
-        };
+        reader.onload = (e) => saveItemData(e.target.result);
         reader.readAsDataURL(fileInput.files[0]);
       } else {
         saveItemData(textInput);
@@ -1230,9 +1617,10 @@
       if (btnElement) btnElement.classList.add('active');
 
       let filtered = itemsData;
-      if (type === 'up') filtered = itemsData.filter(i => (i.trend ? i.trend === 'up' : i.isUp));
-      if (type === 'down') filtered = itemsData.filter(i => (i.trend ? i.trend === 'down' : !i.isUp));
+      if (type === 'up') filtered = itemsData.filter(i => (i.trend === 'up' || i.isUp));
+      if (type === 'down') filtered = itemsData.filter(i => (i.trend === 'down' || (!i.isUp && i.trend !== 'equal' && i.trend !== 'fluct')));
       if (type === 'equal') filtered = itemsData.filter(i => i.trend === 'equal');
+      if (type === 'fluct') filtered = itemsData.filter(i => i.trend === 'fluct');
       if (type === 'cheap') filtered = itemsData.filter(i => i.price < 150);
 
       renderCatalog(filtered);
