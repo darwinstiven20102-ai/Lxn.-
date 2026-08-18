@@ -570,7 +570,7 @@
       bottom: 80px;
       right: 20px;
       width: 300px;
-      max-height: 400px;
+      max-height: 450px;
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -611,7 +611,7 @@
     .cart-items-list {
       padding: 10px;
       overflow-y: auto;
-      max-height: 250px;
+      max-height: 220px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -1005,6 +1005,24 @@
     </div>
     <div class="cart-footer" id="cartTotalFooter">
       <span>Total: $0 COP</span>
+    </div>
+  </div>
+
+  <!-- Modal Notificación de Copiado Exitoso -->
+  <div id="copySuccessModal" class="modal-backdrop">
+    <div class="modal-wrapper" style="max-width: 320px;">
+      <div class="detail-card-design" style="padding: 22px 18px; text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 4px;">✨</div>
+        <div style="font-family: 'Quicksand', sans-serif; font-size: 1.15rem; font-weight: 800; color: #0c2461; margin-bottom: 6px; text-shadow: 0 1px 1px rgba(255,255,255,0.8);">
+          ¡Copiado con éxito!
+        </div>
+        <p style="font-size: 0.82rem; font-weight: 700; color: #0a3d62; opacity: 0.9; margin-bottom: 14px;">
+          Esto se ha copiado con éxito.
+        </p>
+        <button type="button" class="close-btn" onclick="closeCopySuccessModal()" style="background: linear-gradient(180deg, #74b9ff 0%, #0984e3 50%, #006266 100%); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 4px 12px rgba(9, 132, 227, 0.35);">
+          Aceptar
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1483,6 +1501,17 @@
       updateCartUI();
     };
 
+    window.handlePaymentChange = function(radio) {
+      const nequiDisplay = document.getElementById('nequiNumberDisplay');
+      if (nequiDisplay) {
+        if (radio.value === 'Nequi' && radio.checked) {
+          nequiDisplay.style.display = 'block';
+        } else {
+          nequiDisplay.style.display = 'none';
+        }
+      }
+    };
+
     function updateCartUI() {
       const listContainer = document.getElementById('cartItemsList');
       const totalFooter = document.getElementById('cartTotalFooter');
@@ -1543,8 +1572,32 @@
         ${discountHtml}
         <div>Total: $${formatNumber(finalTotal)} COP</div>
         <button class="share-cart-btn" onclick="copyOrderSummary()">📋 Copiar Pedido</button>
+        <div style="margin-top: 8px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+          <div style="display: flex; gap: 18px; align-items: center; justify-content: center;">
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 800; color: #0c2461;">
+              <input type="radio" name="paymentOption" value="Nequi" onchange="handlePaymentChange(this)" style="width: 16px; height: 16px; accent-color: #00a8ff; cursor: pointer;">
+              Nequi
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 800; color: #0c2461;">
+              <input type="radio" name="paymentOption" value="bre-B" onchange="handlePaymentChange(this)" style="width: 16px; height: 16px; accent-color: #00a8ff; cursor: pointer;">
+              bre-B
+            </label>
+          </div>
+          <div id="nequiNumberDisplay" style="display: none; font-size: 0.82rem; font-weight: 900; color: #278d13; background: rgba(255, 255, 255, 0.9); padding: 5px 12px; border-radius: 12px; border: 1.5px solid #4cd137; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            📱 Nequi: 321 43 46 720
+          </div>
+        </div>
       `;
     }
+
+    // MODAL DE COPIADO EXITOSO
+    window.showCopySuccessModal = function() {
+      document.getElementById('copySuccessModal').classList.add('active');
+    };
+
+    window.closeCopySuccessModal = function() {
+      document.getElementById('copySuccessModal').classList.remove('active');
+    };
 
     // LÓGICA DE COPIAR RESUMEN DEL PEDIDO
     window.copyOrderSummary = function() {
@@ -1572,9 +1625,17 @@
       const finalTotal = Math.max(0, subtotal - appliedDiscountTotal);
       text += `💰 *TOTAL A PAGAR*: $${formatNumber(finalTotal)} COP\n`;
 
+      const selectedPayment = document.querySelector('input[name="paymentOption"]:checked');
+      if (selectedPayment) {
+        text += `💳 *Método de Pago*: ${selectedPayment.value}\n`;
+        if (selectedPayment.value === 'Nequi') {
+          text += `📱 *Nequi*: 321 43 46 720\n`;
+        }
+      }
+
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
-          alert("¡Pedido copiado al portapapeles con éxito!\n\nAhora puedes pegarlo directamente en WhatsApp o en el chat.");
+          showCopySuccessModal();
         }).catch(() => fallbackCopyText(text));
       } else {
         fallbackCopyText(text);
@@ -1588,7 +1649,7 @@
       textArea.select();
       try {
         document.execCommand('copy');
-        alert("¡Pedido copiado al portapapeles con éxito!");
+        showCopySuccessModal();
       } catch (err) {
         alert("No se pudo copiar automáticamente. Por favor copia el texto manualmente.");
       }
@@ -1600,19 +1661,21 @@
       const item = itemsData.find(i => i.id === id);
       if (!item) return;
       currentDetailId = id;
+
       const container = document.getElementById('detailCardContainer');
-      const imgContent = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
+      const imageContent = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
         ? `<img src="${item.imageText}" style="width:100%; height:100%; object-fit:cover; border-radius:18px;">`
         : (item.imageText || 'Precio Inestable');
 
       container.innerHTML = `
-        <div class="detail-image-large">${imgContent}</div>
+        <div class="detail-image-large">${imageContent}</div>
         <div class="detail-item-name">${item.name}</div>
         <div class="detail-price-box">
-          <span style="font-size:0.75rem; font-weight:800; color:#0c2461;">Precio</span>
-          <span style="font-size:1.2rem; font-weight:900; color:#0984e3;">$${formatNumber(item.price)} COP</span>
+          <span style="font-size:0.75rem; font-weight:700; color:#0c2461;">Precio Final</span>
+          <span style="font-size:1.1rem; font-weight:900; color:#0c2461;">$${formatNumber(item.price)} COP</span>
         </div>
       `;
+
       document.getElementById('detailModal').classList.add('active');
     };
 
@@ -1621,46 +1684,29 @@
     };
 
     window.downloadItemInfo = function() {
-      const modalContent = document.getElementById('detailCardContainer');
-      html2canvas(modalContent, { backgroundColor: null, scale: 2 }).then(canvas => {
+      const container = document.getElementById('detailCardContainer');
+      if (!container) return;
+
+      html2canvas(container, { backgroundColor: null }).then(canvas => {
         const link = document.createElement('a');
-        link.download = `Moonshop-Item-${currentDetailId}.png`;
-        link.href = canvas.toDataURL('image/png');
+        link.download = `Moonshop_Product_${currentDetailId || 'item'}.png`;
+        link.href = canvas.toDataURL();
         link.click();
       });
     };
 
-    // Modo Edición Secreto (10 Clics en Título)
-    let clickCount = 0;
-    document.getElementById('brandTitle').addEventListener('click', () => {
-      clickCount++;
-      if (clickCount >= 10) {
-        document.body.classList.toggle('edit-mode');
-        alert(document.body.classList.contains('edit-mode') ? "Modo Edición Activado" : "Modo Edición Desactivado");
-        clickCount = 0;
-      }
-    });
-
-    // Filtro Búsqueda
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase().trim();
-      const filtered = itemsData.filter(item => item.name.toLowerCase().includes(term));
-      renderCatalog(filtered);
-    });
-
-    // Modal Edición de Producto
+    // Modal Edición
     window.openEditModal = function(id) {
       const item = itemsData.find(i => i.id === id);
       if (!item) return;
+
       currentEditId = id;
       document.getElementById('editIndex').value = id;
       document.getElementById('editName').value = item.name || '';
       document.getElementById('editImageText').value = (item.imageText && !item.imageText.startsWith('data:')) ? item.imageText : '';
-      document.getElementById('editPriceUSD').value = item.priceUSD || '';
+      document.getElementById('editPriceUSD').value = item.price ? (item.price / USD_RATE).toFixed(2) : '';
       document.getElementById('editPrice').value = item.price ? formatNumber(item.price) : '';
-      document.getElementById('editStarPetsUSD').value = item.starPetsUSD || '';
-      
-      calculateEditPrices();
+
       document.getElementById('editModal').classList.add('active');
     };
 
@@ -1668,84 +1714,19 @@
       document.getElementById('editModal').classList.remove('active');
     };
 
-    function calculateEditPrices() {
-      const spUSD = parseFloat(document.getElementById('editStarPetsUSD').value) || 0;
-      const spCOP = Math.round(spUSD * USD_RATE);
-      document.getElementById('editStarPetsCOP').value = spUSD ? `$${formatNumber(spCOP)} COP` : '';
-
-      const commUSD = spUSD > 0 ? (spUSD * 1.054 + 0.2) : 0;
-      const commCOP = Math.round(commUSD * USD_RATE);
-      document.getElementById('editStarPetsCommissionUSD').value = commUSD ? `$${commUSD.toFixed(2)}` : '';
-      document.getElementById('editStarPetsCommissionCOP').value = commCOP ? `$${formatNumber(commCOP)} COP` : '';
-      document.getElementById('editStarPetsFinalCOP').value = commCOP ? `$${formatNumber(commCOP)} COP` : '';
-
-      const priceUSD = parseFloat(document.getElementById('editPriceUSD').value) || 0;
-      const priceCOP = Math.round(priceUSD * USD_RATE);
-      document.getElementById('editPrice').value = priceUSD ? formatNumber(priceCOP) : '';
-
-      const profitCOPInput = parseFloat(document.getElementById('editProfitCOP').value) || 0;
-      const profitUSD = profitCOPInput / USD_RATE;
-      document.getElementById('editProfitUSD').value = profitCOPInput ? `$${profitUSD.toFixed(2)} USD` : '';
-
-      const profitBadge = document.getElementById('profitContainer');
-      const totalCostCOP = commCOP;
-      const finalPriceCOP = priceCOP + profitCOPInput;
-      const profitMargin = finalPriceCOP - totalCostCOP;
-
-      if (profitMargin >= 0) {
-        profitBadge.className = 'profit-badge-container gain';
-        profitBadge.innerText = `Ganancia: +$${formatNumber(profitMargin)} COP`;
-      } else {
-        profitBadge.className = 'profit-badge-container loss';
-        profitBadge.innerText = `Pérdida: -$${formatNumber(Math.abs(profitMargin))} COP`;
+    // Búsqueda en tiempo real
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      if (!query) {
+        renderCatalog(itemsData);
+        return;
       }
-    }
-
-    ['editStarPetsUSD', 'editPriceUSD', 'editProfitCOP'].forEach(id => {
-      document.getElementById(id)?.addEventListener('input', calculateEditPrices);
+      const filtered = itemsData.filter(item => 
+        item.name.toLowerCase().includes(query) || 
+        (item.imageText && item.imageText.toLowerCase().includes(query))
+      );
+      renderCatalog(filtered);
     });
-
-    document.getElementById('editForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const id = parseInt(document.getElementById('editIndex').value);
-      const itemIndex = itemsData.findIndex(i => i.id === id);
-      if (itemIndex === -1) return;
-
-      const name = document.getElementById('editName').value;
-      const imageText = document.getElementById('editImageText').value;
-      const priceUSD = parseFloat(document.getElementById('editPriceUSD').value) || 0;
-      const profitCOP = parseFloat(document.getElementById('editProfitCOP').value) || 0;
-      const starPetsUSD = parseFloat(document.getElementById('editStarPetsUSD').value) || 0;
-
-      const finalCOP = Math.round(priceUSD * USD_RATE) + profitCOP;
-
-      const updatedItem = {
-        ...itemsData[itemIndex],
-        name,
-        priceUSD,
-        price: finalCOP,
-        starPetsUSD,
-        imageText: imageText || itemsData[itemIndex].imageText
-      };
-
-      const imageFile = document.getElementById('editImageFile').files[0];
-      if (imageFile) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          updatedItem.imageText = event.target.result;
-          saveUpdatedItem(updatedItem);
-        };
-        reader.readAsDataURL(imageFile);
-      } else {
-        saveUpdatedItem(updatedItem);
-      }
-    });
-
-    function saveUpdatedItem(item) {
-      set(ref(db, `items/${item.id - 1}`), item).then(() => {
-        closeEditModal();
-      });
-    }
   </script>
 </body>
 </html>
