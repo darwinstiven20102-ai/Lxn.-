@@ -220,6 +220,7 @@
       color: #00a8ff;
     }
 
+    /* SECCIÓN DE SUBIR ANUNCIO Y BANNER ANUNCIO */
     .ad-upload-box {
       display: none;
       background: rgba(255, 255, 255, 0.65);
@@ -491,7 +492,10 @@
       flex-shrink: 0;
     }
 
-    body.edit-mode .edit-pencil, body.edit-mode .code-pencil-btn {
+    body.edit-mode .edit-pencil {
+      display: flex;
+    }
+    body.edit-mode .code-pencil-btn {
       display: flex;
     }
 
@@ -555,9 +559,27 @@
     }
 
     @keyframes subtleExplosion {
-      0% { box-shadow: 0 6px 18px rgba(9, 132, 227, 0.4), inset -2px -2px 6px rgba(0, 0, 0, 0.4), inset 2px 2px 4px rgba(255, 255, 255, 0.9), 0 0 0 0 rgba(116, 185, 255, 0.5); }
-      70% { box-shadow: 0 6px 18px rgba(9, 132, 227, 0.4), inset -2px -2px 6px rgba(0, 0, 0, 0.4), inset 2px 2px 4px rgba(255, 255, 255, 0.9), 0 0 0 10px rgba(116, 185, 255, 0); }
-      100% { box-shadow: 0 6px 18px rgba(9, 132, 227, 0.4), inset -2px -2px 6px rgba(0, 0, 0, 0.4), inset 2px 2px 4px rgba(255, 255, 255, 0.9), 0 0 0 0 rgba(116, 185, 255, 0); }
+      0% {
+        box-shadow: 
+          0 6px 18px rgba(9, 132, 227, 0.4),
+          inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+          inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+          0 0 0 0 rgba(116, 185, 255, 0.5);
+      }
+      70% {
+        box-shadow: 
+          0 6px 18px rgba(9, 132, 227, 0.4),
+          inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+          inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+          0 0 0 10px rgba(116, 185, 255, 0);
+      }
+      100% {
+        box-shadow: 
+          0 6px 18px rgba(9, 132, 227, 0.4),
+          inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+          inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+          0 0 0 0 rgba(116, 185, 255, 0);
+      }
     }
 
     .floating-cart-bubble:hover {
@@ -570,7 +592,7 @@
       bottom: 80px;
       right: 20px;
       width: 300px;
-      max-height: 450px;
+      max-height: 400px;
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -611,7 +633,7 @@
     .cart-items-list {
       padding: 10px;
       overflow-y: auto;
-      max-height: 220px;
+      max-height: 250px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -675,7 +697,7 @@
       gap: 6px;
     }
 
-    .share-cart-btn {
+    .download-cart-btn {
       width: 100%;
       padding: 8px;
       border-radius: 12px;
@@ -686,6 +708,23 @@
       font-size: 0.78rem;
       cursor: pointer;
       box-shadow: 0 3px 10px rgba(9, 132, 227, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .copy-cart-btn {
+      width: 100%;
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      background: linear-gradient(180deg, #2ed573 0%, #20bf6b 100%);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.78rem;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(46, 213, 115, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -940,7 +979,7 @@
 
   <div class="bg-bubbles" id="bubbleContainer"></div>
 
-  <div class="app-container" id="mainAppContainer">
+  <div class="app-container">
     
     <header class="brand-header">
       <h1 class="brand-title" id="brandTitle">
@@ -953,7 +992,7 @@
         <span class="l-moon" title="MOONSHOP"></span>
         <span class="l-char l-p">P</span>
       </h1>
-      <div class="tagline">Catálogo • Ac 17/08/2026</div>
+      <div class="tagline">Catalogo•  Ac 17/08/2026</div>
     </header>
 
     <div class="search-section">
@@ -962,7 +1001,7 @@
         <input type="text" id="searchInput" class="search-input" placeholder="Buscar producto en Moonshop...">
       </div>
 
-      <!-- Opción Subir Anuncio -->
+      <!-- Opción Subir Anuncio (Aparece al tocar 10 veces MOONSHOP) -->
       <div id="adUploadBox" class="ad-upload-box">
         <label for="adFileInput" id="uploadAdLabel" class="upload-ad-btn">
           📢 <span id="uploadAdText">Subir anuncio</span>
@@ -971,11 +1010,10 @@
         <button id="removeAdBtn" type="button" class="remove-ad-btn" style="display:none;">🗑️ Eliminar anuncio</button>
       </div>
 
-      <!-- Banner de Anuncio -->
+      <!-- Contenedor del Banner de Anuncio del mismo tamaño del contenedor del título -->
       <div id="adBannerCard" class="ad-banner-card">
         <img id="adBannerImg" class="ad-banner-img" src="" alt="Anuncio Moonshop">
       </div>
-    </div>
 
     <main class="catalog-grid" id="catalog"></main>
 
@@ -989,10 +1027,10 @@
   <div class="floating-cart-bubble" id="floatingCartBubble" onclick="toggleCartPanel()">$</div>
   <div class="mini-toast" id="miniToast">Item agregado</div>
   
-  <!-- Panel Desplegable del Carrito -->
+  <!-- Panel Desplegable -->
   <div class="cart-panel" id="cartPanel">
     <div class="cart-header">
-      <span>Items en Carrito</span>
+      <span>Items en Burbuja</span>
       <span style="cursor:pointer;" onclick="toggleCartPanel()">✕</span>
     </div>
     <div style="padding: 8px 12px; background: rgba(255, 255, 255, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.8); display: flex; gap: 6px; align-items: center;">
@@ -1000,34 +1038,11 @@
       <button type="button" onclick="applyDiscountCode()" style="padding:6px 10px; border-radius:10px; border:1px solid #fff; background:linear-gradient(180deg, #74b9ff 0%, #0984e3 100%); color:#fff; font-weight:800; font-size:0.72rem; cursor:pointer;">Usar</button>
       <div class="code-pencil-btn" onclick="openCodeManagerModal()" title="Gestionar códigos de un solo uso">✏️</div>
     </div>
-    <!-- Apartado para pegar lista de pedido copiada (Oculto inicialmente) -->
-    <div id="pasteSection" style="display: none; padding: 6px 12px; background: rgba(255, 255, 255, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.8); gap: 6px; align-items: center;">
-      <input type="text" id="pasteOrderInput" placeholder="Pega tu resumen aquí..." style="flex:1; padding:6px 10px; border-radius:10px; border:1px solid #fff; background:rgba(255, 255, 255, 0.9); font-size:0.72rem; font-weight:700; color:#0c2461; outline:none;">
-      <button type="button" onclick="loadOrderFromPaste()" style="padding:6px 10px; border-radius:10px; border:1px solid #fff; background:linear-gradient(180deg, #74b9ff 0%, #0984e3 100%); color:#fff; font-weight:800; font-size:0.72rem; cursor:pointer;">Usar</button>
-    </div>
     <div class="cart-items-list" id="cartItemsList">
       <div style="text-align:center; color:#636e72; font-size:0.75rem; font-weight:700; padding:20px;">No hay items agregados</div>
     </div>
     <div class="cart-footer" id="cartTotalFooter">
-      <span>Total: $0 COP</span>
-    </div>
-  </div>
-
-  <!-- Modal Notificación de Copiado Exitoso -->
-  <div id="copySuccessModal" class="modal-backdrop">
-    <div class="modal-wrapper" style="max-width: 320px;">
-      <div class="detail-card-design" style="padding: 22px 18px; text-align: center;">
-        <div style="font-size: 2.5rem; margin-bottom: 4px;">✨</div>
-        <div style="font-family: 'Quicksand', sans-serif; font-size: 1.15rem; font-weight: 800; color: #0c2461; margin-bottom: 6px; text-shadow: 0 1px 1px rgba(255,255,255,0.8);">
-          ¡Copiado con éxito!
-        </div>
-        <p style="font-size: 0.82rem; font-weight: 700; color: #0a3d62; opacity: 0.9; margin-bottom: 14px;">
-          Esto se ha copiado con éxito.
-        </p>
-        <button type="button" class="close-btn" onclick="closeCopySuccessModal()" style="background: linear-gradient(180deg, #74b9ff 0%, #0984e3 50%, #006266 100%); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 4px 12px rgba(9, 132, 227, 0.35);">
-          Aceptar
-        </button>
-      </div>
+      <span>Total: $0</span>
     </div>
   </div>
 
@@ -1094,8 +1109,11 @@
           <input type="text" id="editName" class="edit-input">
         </div>
 
+        <!-- SECCIÓN PRECIO STARPETS (STARPEX) - 3 COSITOS -->
         <div>
           <label class="edit-label">3. Precio Starpex (Star Pets):</label>
+          
+          <!-- Cosito 1: Precio original -->
           <div style="margin-bottom: 6px;">
             <span style="font-size:0.68rem; color:#0c2461; font-weight:800; display:block; margin-bottom:2px;">• Precio original (USD / COP)</span>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -1104,6 +1122,7 @@
             </div>
           </div>
 
+          <!-- Cosito 2: Con comisión ya incluida (5.4% + 0.2$) -->
           <div style="margin-bottom: 6px;">
             <span style="font-size:0.68rem; color:#0c2461; font-weight:800; display:block; margin-bottom:2px;">• Con comisión incluida (5.4% + 0.2$)</span>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -1112,12 +1131,14 @@
             </div>
           </div>
 
+          <!-- Cosito 3: Valor colombiano total -->
           <div>
             <span style="font-size:0.68rem; color:#0c2461; font-weight:800; display:block; margin-bottom:2px;">• Precio final en valor colombiano (COP)</span>
             <input type="text" id="editStarPetsFinalCOP" class="edit-input" placeholder="Valor final COP" readonly style="background: rgba(255, 255, 255, 0.45); font-weight: 900; color: #009432;">
           </div>
         </div>
 
+        <!-- SECCIÓN AGREGAR GANANCIA -->
         <div>
           <label class="edit-label">4. Agregar Ganancia:</label>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -1132,6 +1153,7 @@
           </div>
         </div>
 
+        <!-- SECCIÓN PRECIO ACTUAL -->
         <div>
           <label class="edit-label">5. Precio Actual:</label>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -1146,13 +1168,14 @@
           </div>
         </div>
 
+        <!-- INDICADOR DE GANANCIA / PÉRDIDA -->
         <div id="profitContainer" class="profit-badge-container">
           Ganancia / Pérdida: $0 COP
         </div>
 
         <div style="display:flex; gap:8px; margin-top:10px;">
-          <button type="button" onclick="closeEditModal()" style="flex:1; padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,0.9); background:rgba(255,255,255,0.7); font-weight:800; color:#0c2461; cursor:pointer; font-size:0.82rem;">Cancelar</button>
-          <button type="submit" style="flex:1; padding:10px; border-radius:14px; border:1px solid #fff; background:linear-gradient(180deg, #74b9ff 0%, #0984e3 50%, #006266 100%); color:#fff; font-weight:800; cursor:pointer; font-size:0.82rem;">Guardar</button>
+          <button type="button" onclick="closeEditModal()" style="flex:1; padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,0.9); background:rgba(255,255,255,0.7); font-weight:800; color:#0c2461; cursor:pointer; font-size:0.82rem; box-shadow:0 3px 8px rgba(0,0,0,0.1);">Cancelar</button>
+          <button type="submit" style="flex:1; padding:10px; border-radius:14px; border:1px solid #fff; background:linear-gradient(180deg, #74b9ff 0%, #0984e3 50%, #006266 100%); color:#fff; font-weight:800; cursor:pointer; font-size:0.82rem; box-shadow:0 4px 12px rgba(9,132,227,0.4);">Guardar</button>
         </div>
       </form>
     </div>
@@ -1206,7 +1229,7 @@
 
     const TARGET_ITEMS_COUNT = 121; 
 
-    // Cargar productos desde Firebase
+    // Cargar productos
     const itemsRef = ref(db, 'items');
     onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();
@@ -1269,12 +1292,18 @@
         const reader = new FileReader();
         reader.onload = (event) => {
           const base64Img = event.target.result;
-          set(ref(db, 'bannerAd'), base64Img);
+          set(ref(db, 'bannerAd'), base64Img).then(() => {
+            const uploadAdText = document.getElementById('uploadAdText');
+            const uploadAdLabel = document.getElementById('uploadAdLabel');
+            if (uploadAdText) uploadAdText.innerText = 'Guardado';
+            if (uploadAdLabel) uploadAdLabel.style.background = 'linear-gradient(180deg, #2ed573 0%, #20bf6b 100%)';
+          });
         };
         reader.readAsDataURL(file);
       }
     });
 
+    // Manejar eliminación del anuncio
     document.getElementById('removeAdBtn').addEventListener('click', () => {
       if (confirm("¿Deseas eliminar el anuncio publicitario?")) {
         remove(ref(db, 'bannerAd'));
@@ -1342,19 +1371,9 @@
     window.toggleCartPanel = function() {
       const panel = document.getElementById('cartPanel');
       panel.classList.toggle('active');
-    };
+    }
 
-    // Mostrar u ocultar apartado de pegar resumen al escribir "pegar" en códigos de descuento
-    document.getElementById('cartPromoInput').addEventListener('input', (e) => {
-      const val = e.target.value.trim().toLowerCase();
-      const pasteSection = document.getElementById('pasteSection');
-      if (val === 'pegar') {
-        pasteSection.style.display = 'flex';
-      } else {
-        pasteSection.style.display = 'none';
-      }
-    });
-
+    // Aplicar código de descuento de un solo uso
     window.applyDiscountCode = function() {
       const codeInput = document.getElementById('cartPromoInput').value.trim().toUpperCase();
       if (!codeInput) {
@@ -1382,62 +1401,18 @@
         appliedDiscountTotal = parseFloat(foundCode.discount) || 0;
         appliedDiscountName = foundCode.code;
 
+        // Marcar automáticamente como USADO
         set(ref(db, `singleUseCodes/${foundKey}/used`), true);
 
-        alert(`¡Código "${foundCode.code}" aplicado con éxito!\nDescuento de -$${formatNumber(appliedDiscountTotal)} COP`);
+        alert(`¡Código "${foundCode.code}" (Un solo uso) aplicado con éxito!\nDescuento de -$${formatNumber(appliedDiscountTotal)} COP`);
         document.getElementById('cartPromoInput').value = '';
       } else {
-        alert("El código ingresado no existe o ya ha sido utilizado.");
+        alert("El código ingresado no existe, o ya ha sido utilizado por alguien.");
       }
       updateCartUI();
     };
 
-    // Función para cargar items pegando el resumen del pedido
-    window.loadOrderFromPaste = function() {
-      const inputVal = document.getElementById('pasteOrderInput').value.trim();
-      if (!inputVal) {
-        alert("Pega tu resumen del pedido en el campo.");
-        return;
-      }
-
-      const parts = inputVal.split(/[•\n]/);
-      let newCartItems = [];
-
-      parts.forEach(part => {
-        const cleanPart = part.trim();
-        if (!cleanPart) return;
-
-        const match = cleanPart.match(/\*?([^*]+)\*?\s*\(x(\d+)\)\s*->\s*\$?\s*([0-9.,]+)\s*COP/i);
-        if (match) {
-          const name = match[1].trim();
-          const qty = parseInt(match[2], 10);
-          const priceStr = match[3].replace(/\./g, '').replace(/,/g, '');
-          const totalPrice = parseFloat(priceStr) || 0;
-          const unitPrice = qty > 0 ? totalPrice / qty : totalPrice;
-
-          let existingItem = itemsData.find(i => i.name.toLowerCase() === name.toLowerCase());
-          let itemId = existingItem ? existingItem.id : Date.now() + Math.random();
-
-          newCartItems.push({
-            id: itemId,
-            name: name,
-            price: unitPrice,
-            qty: qty,
-            imageText: existingItem ? existingItem.imageText : '📦'
-          });
-        }
-      });
-
-      if (newCartItems.length > 0) {
-        cartItems = newCartItems;
-        updateCartUI();
-        document.getElementById('pasteOrderInput').value = '';
-        alert("¡Pedido cargado con éxito en el carrito!");
-      } else {
-        alert("No se pudo reconocer ningún ítem en el texto pegado. Asegúrate de que tenga el formato correcto.");
-      }
-    };
-
+    // Funciones Modal Códigos
     window.openCodeManagerModal = function() {
       document.getElementById('codeManagerModal').classList.add('active');
       renderCodesList();
@@ -1447,13 +1422,14 @@
       document.getElementById('codeManagerModal').classList.remove('active');
     };
 
+    // Crear código de un solo uso
     document.getElementById('codeForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const codeStr = document.getElementById('newCodeInput').value.trim().toUpperCase();
       const valNum = parseFloat(document.getElementById('newCodeValue').value) || 0;
 
       if (!codeStr || valNum <= 0) {
-        alert("Escribe un código y un valor válido.");
+        alert("Por favor escribe un código y un valor válido.");
         return;
       }
 
@@ -1509,29 +1485,27 @@
       if (!item) return;
 
       showMiniToast(item.name);
-      if (event && event.target) {
-        const btnRect = event.target.getBoundingClientRect();
-        const bubbleRect = document.getElementById('floatingCartBubble').getBoundingClientRect();
+      const btnRect = event.target.getBoundingClientRect();
+      const bubbleRect = document.getElementById('floatingCartBubble').getBoundingClientRect();
 
-        const flyer = document.createElement('div');
-        flyer.className = 'flying-item';
-        flyer.innerHTML = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
-          ? `<img src="${item.imageText}" style="width:100%;height:100%;object-fit:cover;">`
-          : (item.imageText || '💲');
-        
-        flyer.style.left = `${btnRect.left}px`;
-        flyer.style.top = `${btnRect.top}px`;
-        document.body.appendChild(flyer);
+      const flyer = document.createElement('div');
+      flyer.className = 'flying-item';
+      flyer.innerHTML = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
+        ? `<img src="${item.imageText}" style="width:100%;height:100%;object-fit:cover;">`
+        : (item.imageText || '💲');
+      
+      flyer.style.left = `${btnRect.left}px`;
+      flyer.style.top = `${btnRect.top}px`;
+      document.body.appendChild(flyer);
 
-        setTimeout(() => {
-          flyer.style.left = `${bubbleRect.left + 10}px`;
-          flyer.style.top = `${bubbleRect.top + 10}px`;
-          flyer.style.transform = 'scale(0.2)';
-          flyer.style.opacity = '0';
-        }, 20);
+      setTimeout(() => {
+        flyer.style.left = `${bubbleRect.left + 10}px`;
+        flyer.style.top = `${bubbleRect.top + 10}px`;
+        flyer.style.transform = 'scale(0.2)';
+        flyer.style.opacity = '0';
+      }, 20);
 
-        setTimeout(() => flyer.remove(), 620);
-      }
+      setTimeout(() => flyer.remove(), 620);
 
       const existing = cartItems.find(i => i.id === id);
       if (existing) {
@@ -1541,7 +1515,7 @@
       }
 
       updateCartUI();
-    };
+    }
 
     function showMiniToast(itemName) {
       const toast = document.getElementById('miniToast');
@@ -1561,18 +1535,7 @@
         }
       }
       updateCartUI();
-    };
-
-    window.handlePaymentChange = function(radio) {
-      const nequiDisplay = document.getElementById('nequiNumberDisplay');
-      if (nequiDisplay) {
-        if (radio.value === 'Nequi' && radio.checked) {
-          nequiDisplay.style.display = 'block';
-        } else {
-          nequiDisplay.style.display = 'none';
-        }
-      }
-    };
+    }
 
     function updateCartUI() {
       const listContainer = document.getElementById('cartItemsList');
@@ -1588,11 +1551,12 @@
         panel.classList.remove('has-items-panel');
         appliedDiscountTotal = 0;
         appliedDiscountName = '';
+        document.getElementById('cartPromoInput').value = '';
       }
 
       if (cartItems.length === 0) {
         listContainer.innerHTML = `<div style="text-align:center; color:#636e72; font-size:0.75rem; font-weight:700; padding:20px;">No hay items agregados</div>`;
-        totalFooter.innerHTML = `<span>Total: $0 COP</span>`;
+        totalFooter.innerHTML = `<span>Total: $0</span>`;
         return;
       }
 
@@ -1611,180 +1575,303 @@
             <div class="cart-item-img">${imgContent}</div>
             <div class="cart-item-info">
               <div class="cart-item-title">${item.name} (x${item.qty})</div>
-              <div class="cart-item-price">$${formatNumber(itemTotal)} COP</div>
+              <div class="cart-item-price">$${formatNumber(itemTotal)}</div>
             </div>
-            <div style="display:flex; gap:3px;">
-              <button class="qty-btn" onclick="addItemToCart(${item.id}, event)">+</button>
-              <button class="qty-btn minus" onclick="removeItemFromCart(${item.id})">-</button>
-            </div>
+            <button class="qty-btn minus" onclick="removeItemFromCart(${item.id})" style="width:16px; height:14px; font-size:0.55rem;">-</button>
           </div>
         `;
         listContainer.insertAdjacentHTML('beforeend', rowHTML);
       });
 
-      const finalTotal = Math.max(0, grandTotal - appliedDiscountTotal);
-
-      let discountHtml = '';
-      if (appliedDiscountTotal > 0) {
-        discountHtml = `<div style="font-size:0.75rem; color:#e84118; font-weight:800;">Descuento (${appliedDiscountName}): -$${formatNumber(appliedDiscountTotal)} COP</div>`;
-      }
+      let finalTotal = grandTotal - appliedDiscountTotal;
+      if (finalTotal < 0) finalTotal = 0;
 
       totalFooter.innerHTML = `
-        ${discountHtml}
-        <div>Total: $${formatNumber(finalTotal)} COP</div>
-        <button class="share-cart-btn" onclick="copyOrderSummary()">📋 Copiar Pedido</button>
-        <div style="margin-top: 8px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-          <div style="display: flex; gap: 18px; align-items: center; justify-content: center;">
-            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 800; color: #0c2461;">
-              <input type="radio" name="paymentOption" value="Nequi" onchange="handlePaymentChange(this)" style="width: 16px; height: 16px; accent-color: #00a8ff; cursor: pointer;">
-              Nequi
-            </label>
-            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 800; color: #0c2461;">
-              <input type="radio" name="paymentOption" value="bre-B" onchange="handlePaymentChange(this)" style="width: 16px; height: 16px; accent-color: #00a8ff; cursor: pointer;">
-              bre-B
-            </label>
-          </div>
-          <div id="nequiNumberDisplay" style="display: none; font-size: 0.82rem; font-weight: 900; color: #278d13; background: rgba(255, 255, 255, 0.9); padding: 5px 12px; border-radius: 12px; border: 1.5px solid #4cd137; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-            📱 Nequi: 321 43 46 720
-          </div>
+        ${appliedDiscountTotal > 0 ? `<div style="font-size:0.72rem; color:#e84118; font-weight:800;">Descuento (${appliedDiscountName}): -$${formatNumber(appliedDiscountTotal)}</div>` : ''}
+        <span>Total: $${formatNumber(finalTotal)} COP</span>
+        <div style="display: flex; gap: 6px; margin-top: 4px;">
+          <button class="download-cart-btn" onclick="downloadCartAsImage()">📥 Descargar</button>
+          <button class="copy-cart-btn" onclick="copyCartList()">📋 Copiar Lista</button>
         </div>
       `;
     }
 
-    // MODAL DE COPIADO EXITOSO
-    window.showCopySuccessModal = function() {
-      document.getElementById('copySuccessModal').classList.add('active');
-    };
-
-    window.closeCopySuccessModal = function() {
-      document.getElementById('copySuccessModal').classList.remove('active');
-    };
-
-    // LÓGICA DE COPIAR RESUMEN DEL PEDIDO
-    window.copyOrderSummary = function() {
+    window.copyCartList = function() {
       if (cartItems.length === 0) {
         alert("El carrito está vacío.");
         return;
       }
 
+      let grandTotal = 0;
       let text = "🛒 *RESUMEN DEL PEDIDO - MOONSHOP*\n";
       text += "-----------------------------------\n";
 
-      let subtotal = 0;
       cartItems.forEach(item => {
         const itemTotal = (parseFloat(item.price) || 0) * item.qty;
-        subtotal += itemTotal;
+        grandTotal += itemTotal;
         text += `• *${item.name}* (x${item.qty}) -> $${formatNumber(itemTotal)} COP\n`;
       });
 
+      let finalTotal = grandTotal - appliedDiscountTotal;
+      if (finalTotal < 0) finalTotal = 0;
+
       text += "-----------------------------------\n";
-
       if (appliedDiscountTotal > 0) {
-        text += `🎟️ *Descuento Aplicado (${appliedDiscountName})*: -$${formatNumber(appliedDiscountTotal)} COP\n`;
+        text += `• *Descuento* (${appliedDiscountName}) -> -$${formatNumber(appliedDiscountTotal)} COP\n`;
+        text += "-----------------------------------\n";
       }
+      text += `💰 *TOTAL A PAGAR*: $${formatNumber(finalTotal)} COP`;
 
-      const finalTotal = Math.max(0, subtotal - appliedDiscountTotal);
-      text += `💰 *TOTAL A PAGAR*: $${formatNumber(finalTotal)} COP\n`;
-
-      const selectedPayment = document.querySelector('input[name="paymentOption"]:checked');
-      if (selectedPayment) {
-        text += `💳 *Método de Pago*: ${selectedPayment.value}\n`;
-        if (selectedPayment.value === 'Nequi') {
-          text += `📱 *Nequi*: 321 43 46 720\n`;
-        }
-      }
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-          showCopySuccessModal();
-        }).catch(() => fallbackCopyText(text));
-      } else {
-        fallbackCopyText(text);
-      }
+      navigator.clipboard.writeText(text).then(() => {
+        alert("¡Lista copiada al portapapeles de forma ordenada!");
+      }).catch(err => {
+        console.error("Error al copiar: ", err);
+      });
     };
 
-    function fallbackCopyText(text) {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        showCopySuccessModal();
-      } catch (err) {
-        alert("No se pudo copiar automáticamente. Por favor copia el texto manualmente.");
+    window.downloadCartAsImage = function() {
+      const panel = document.getElementById('cartPanel');
+      if (cartItems.length === 0) {
+        alert("El carrito está vacío.");
+        return;
       }
-      document.body.removeChild(textArea);
-    }
 
-    // Modal Detalle
+      html2canvas(panel, { backgroundColor: null, scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `MOONSHOP_Carrito.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    };
+
     window.openDetailModal = function(id) {
       const item = itemsData.find(i => i.id === id);
       if (!item) return;
       currentDetailId = id;
 
-      const container = document.getElementById('detailCardContainer');
       const imageContent = item.imageText && (item.imageText.startsWith('http') || item.imageText.startsWith('data:'))
-        ? `<img src="${item.imageText}" style="width:100%; height:100%; object-fit:cover; border-radius:18px;">`
+        ? `<img src="${item.imageText}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`
         : (item.imageText || 'Precio Inestable');
 
-      container.innerHTML = `
+      const detailCardHTML = `
         <div class="detail-image-large">${imageContent}</div>
         <div class="detail-item-name">${item.name}</div>
         <div class="detail-price-box">
-          <span style="font-size:0.75rem; font-weight:700; color:#0c2461;">Precio Final</span>
-          <span style="font-size:1.1rem; font-weight:900; color:#0c2461;">$${formatNumber(item.price)} COP</span>
+          <div class="price-row" style="justify-content: center; gap: 8px;">
+            <span class="item-price" style="font-size: 1.35rem;">$${formatNumber(item.price)}</span>
+          </div>
         </div>
       `;
 
+      document.getElementById('detailCardContainer').innerHTML = detailCardHTML;
       document.getElementById('detailModal').classList.add('active');
     };
 
     window.closeDetailModal = function() {
       document.getElementById('detailModal').classList.remove('active');
+      currentDetailId = null;
     };
 
     window.downloadItemInfo = function() {
-      const container = document.getElementById('detailCardContainer');
-      if (!container) return;
+      const cardElement = document.getElementById('detailCardContainer');
+      if (!cardElement) return;
 
-      html2canvas(container, { backgroundColor: null }).then(canvas => {
+      html2canvas(cardElement, { backgroundColor: null, scale: 2, useCORS: true }).then(canvas => {
         const link = document.createElement('a');
-        link.download = `Moonshop_Product_${currentDetailId || 'item'}.png`;
-        link.href = canvas.toDataURL();
+        link.download = `MOONSHOP_Item_${currentDetailId || 'info'}.png`;
+        link.href = canvas.toDataURL('image/png');
         link.click();
       });
     };
 
-    // Modal Edición
+    let clickCount = 0;
+    let clickTimer = null;
+    document.getElementById('brandTitle').addEventListener('click', () => {
+      clickCount++;
+      clearTimeout(clickTimer);
+      if (clickCount >= 10) {
+        clickCount = 0;
+        document.body.classList.toggle('edit-mode');
+        const activeEdit = document.body.classList.contains('edit-mode');
+        alert(activeEdit ? '¡Modo Edición Activado! Ahora puedes usar la opción "Subir anuncio" debajo de la barra de búsqueda o presionar el lápiz ✏️ en productos.' : 'Modo Edición Desactivado.');
+        renderCatalog(itemsData);
+      } else {
+        clickTimer = setTimeout(() => clickCount = 0, 2000);
+      }
+    });
+
+    function calculateProfit() {
+      const starPetsUSD = parseFloat(document.getElementById('editStarPetsUSD').value) || 0;
+      const profitCOP = parseFloat(document.getElementById('editProfitCOP').value) || 0;
+
+      const totalStarPetsUSD = starPetsUSD > 0 ? (starPetsUSD * 1.054) + 0.2 : 0;
+      const starPetsCOP = Math.round(totalStarPetsUSD * USD_RATE);
+
+      const finalPriceCOP = starPetsCOP + profitCOP;
+      const finalPriceUSD = finalPriceCOP / USD_RATE;
+
+      if (starPetsUSD > 0) {
+        document.getElementById('editPriceUSD').value = Number(finalPriceUSD.toFixed(2));
+        document.getElementById('editPrice').value = formatNumber(finalPriceCOP);
+      }
+
+      const profitContainer = document.getElementById('profitContainer');
+      profitContainer.classList.remove('gain', 'loss');
+
+      if (profitCOP > 0) {
+        profitContainer.classList.add('gain');
+        profitContainer.innerText = `Ganancia: +$${formatNumber(profitCOP)} COP`;
+      } else if (profitCOP < 0) {
+        profitContainer.classList.add('loss');
+        profitContainer.innerText = `Pérdida: -$${formatNumber(Math.abs(profitCOP))} COP`;
+      } else {
+        profitContainer.innerText = `Sin Ganancia / Pérdida ($0 COP)`;
+      }
+    }
+
+    const starPetsUSDInput = document.getElementById('editStarPetsUSD');
+    const starPetsCOPInput = document.getElementById('editStarPetsCOP');
+    const starPetsCommUSDInput = document.getElementById('editStarPetsCommissionUSD');
+    const starPetsCommCOPInput = document.getElementById('editStarPetsCommissionCOP');
+    const starPetsFinalCOPInput = document.getElementById('editStarPetsFinalCOP');
+    const profitCOPInput = document.getElementById('editProfitCOP');
+    const profitUSDInput = document.getElementById('editProfitUSD');
+
+    starPetsUSDInput.addEventListener('input', (e) => {
+      const usdVal = parseFloat(e.target.value);
+      if (!isNaN(usdVal) && usdVal >= 0) {
+        const copVal = Math.round(usdVal * USD_RATE);
+        starPetsCOPInput.value = formatNumber(copVal);
+
+        const totalUSD = (usdVal * 1.054) + 0.2;
+        starPetsCommUSDInput.value = `$${totalUSD.toFixed(2)}`;
+
+        const totalCOP = Math.round(totalUSD * USD_RATE);
+        starPetsCommCOPInput.value = formatNumber(totalCOP);
+        starPetsFinalCOPInput.value = `$${formatNumber(totalCOP)} COP`;
+      } else {
+        starPetsCOPInput.value = '';
+        starPetsCommUSDInput.value = '';
+        starPetsCommCOPInput.value = '';
+        starPetsFinalCOPInput.value = '';
+      }
+      calculateProfit();
+    });
+
+    profitCOPInput.addEventListener('input', (e) => {
+      const profitCOPVal = parseFloat(e.target.value);
+      if (!isNaN(profitCOPVal)) {
+        const profitUSD = profitCOPVal / USD_RATE;
+        profitUSDInput.value = `$${profitUSD.toFixed(2)}`;
+      } else {
+        profitUSDInput.value = '';
+      }
+      calculateProfit();
+    });
+
     window.openEditModal = function(id) {
       const item = itemsData.find(i => i.id === id);
       if (!item) return;
-
       currentEditId = id;
-      document.getElementById('editIndex').value = id;
-      document.getElementById('editName').value = item.name || '';
-      document.getElementById('editImageText').value = (item.imageText && !item.imageText.startsWith('data:')) ? item.imageText : '';
-      document.getElementById('editPriceUSD').value = item.price ? (item.price / USD_RATE).toFixed(2) : '';
-      document.getElementById('editPrice').value = item.price ? formatNumber(item.price) : '';
+
+      document.getElementById('editImageFile').value = '';
+      document.getElementById('editImageText').value = item.imageText || '';
+      document.getElementById('editName').value = item.name;
+      
+      const copStarPets = parseFloat(item.starPetsPrice) || 0;
+      let usdStarPets = '';
+      if (copStarPets > 0) {
+        const totalUSD = copStarPets / USD_RATE;
+        const baseUSD = (totalUSD - 0.2) / 1.054;
+        usdStarPets = baseUSD > 0 ? Number(baseUSD.toFixed(2)) : '';
+      }
+      document.getElementById('editStarPetsUSD').value = usdStarPets;
+      
+      if (usdStarPets !== '') {
+        const baseCOP = Math.round(usdStarPets * USD_RATE);
+        starPetsCOPInput.value = formatNumber(baseCOP);
+
+        const totalUSD = (usdStarPets * 1.054) + 0.2;
+        starPetsCommUSDInput.value = `$${totalUSD.toFixed(2)}`;
+
+        const totalCOP = Math.round(totalUSD * USD_RATE);
+        starPetsCommCOPInput.value = formatNumber(totalCOP);
+        starPetsFinalCOPInput.value = `$${formatNumber(totalCOP)} COP`;
+      } else {
+        starPetsCOPInput.value = '';
+        starPetsCommUSDInput.value = '';
+        starPetsCommCOPInput.value = '';
+        starPetsFinalCOPInput.value = '';
+      }
+
+      document.getElementById('editProfitCOP').value = '';
+      document.getElementById('editProfitUSD').value = '';
+
+      const copPrice = parseFloat(item.price) || 0;
+      const usdPrice = copPrice ? (copPrice / USD_RATE) : '';
+      document.getElementById('editPriceUSD').value = usdPrice !== '' ? Number(usdPrice.toFixed(2)) : '';
+      document.getElementById('editPrice').value = copPrice ? formatNumber(copPrice) : '';
+      
+      calculateProfit();
 
       document.getElementById('editModal').classList.add('active');
     };
 
     window.closeEditModal = function() {
       document.getElementById('editModal').classList.remove('active');
+      currentEditId = null;
     };
 
-    // Búsqueda en tiempo real
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
-      if (!query) {
-        renderCatalog(itemsData);
-        return;
+    document.getElementById('editForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (currentEditId === null) return;
+
+      const fileInput = document.getElementById('editImageFile');
+      const textInput = document.getElementById('editImageText').value;
+      
+      const usdStarPets = parseFloat(document.getElementById('editStarPetsUSD').value) || 0;
+      const totalStarPetsUSD = usdStarPets > 0 ? (usdStarPets * 1.054) + 0.2 : 0;
+      const rawStarPets = Math.round(totalStarPetsUSD * USD_RATE);
+
+      const usdPrice = parseFloat(document.getElementById('editPriceUSD').value) || 0;
+      const rawPrice = Math.round(usdPrice * USD_RATE);
+
+      const saveItemData = (imageVal) => {
+        const updatedItem = {
+          id: currentEditId,
+          imageText: imageVal,
+          name: document.getElementById('editName').value,
+          starPetsPrice: rawStarPets,
+          price: rawPrice
+        };
+
+        set(ref(db, `items/${currentEditId - 1}`), updatedItem);
+        window.closeEditModal();
+      };
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => saveItemData(e.target.result);
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        saveItemData(textInput);
       }
+    });
+
+    window.filterItems = function(type, btnElement) {
+      document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+
+      let filtered = itemsData;
+      if (type === 'cheap') filtered = itemsData.filter(i => i.price < 150 * USD_RATE);
+
+      renderCatalog(filtered);
+    };
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
       const filtered = itemsData.filter(item => 
-        item.name.toLowerCase().includes(query) || 
-        (item.imageText && item.imageText.toLowerCase().includes(query))
+        item.name.toLowerCase().includes(term) || item.price.toString().includes(term)
       );
       renderCatalog(filtered);
     });
